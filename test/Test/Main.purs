@@ -12,4 +12,5 @@ import Test.Specs (spec)
 main :: Effect Unit
 main = do
   --benchs
-  launchAff_ $ runSpec [ consoleReporter ] spec
+  launchAff_ $ runSpec [ consoleReporter ] do
+    spec
