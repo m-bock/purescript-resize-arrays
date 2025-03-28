@@ -1,20 +1,27 @@
 module Data.ResizeArray
-  --   ( ResizeArray
-  --   , addEnd
-  --   , addStart
-  --   , debug
-  --   , dropEnd
-  --   , dropStart
-  --   , dropWhileEnd
-  --   , dropWhileStart
-  --   , empty
-  --   , fromArray
-  --   , getEnd
-  --   , getStart
-  --   , offset
-  --   , reindex
-  --   ) 
-
+  ( IndexSnapshot
+  , ResizeArray
+  , cons
+  , debug
+  , debug2
+  , drop
+  , dropEnd
+  , dropEndWhile
+  , dropWhile
+  , empty
+  , emptyAt
+  , fromArray
+  , fromArrayAt
+  , head
+  , index
+  , isEmpty
+  , last
+  , length
+  , reindex
+  , snoc
+  , toList
+  , toListWithIndices
+  )
   where
 
 import Prelude
@@ -22,18 +29,19 @@ import Prelude
 import Control.Monad.Rec.Class (Step(..), tailRec)
 import Data.Foldable (class Foldable, foldMapDefaultL, foldl, foldr)
 import Data.FoldableWithIndex (class FoldableWithIndex, foldMapWithIndexDefaultL, foldlWithIndex, foldrWithIndex)
-import Data.FunctorWithIndex (mapWithIndex)
 import Data.List (List)
 import Data.List as List
-import Data.Map (Map)
-import Data.Map as Map
+import Data.HashMap (HashMap)
+import Data.HashMap as Map
 import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
-import Unsafe.Coerce (unsafeCoerce)
+import Data.Tuple.Nested (type (/\), (/\))
+
+type Map a b = HashMap a b
 
 newtype ResizeArray a = ResizeArray
   { items :: Map Int a
-  , anchorIndex :: Int -- The index before the first element
+  , anchorIndex :: Int -- The index before the head element
   }
 
 isEmpty :: forall a. ResizeArray a -> Boolean
@@ -42,8 +50,12 @@ isEmpty (ResizeArray { items }) = Map.isEmpty items
 length :: forall a. ResizeArray a -> Int
 length (ResizeArray { items }) = Map.size items
 
-getFirstIndex :: forall a. ResizeArray a -> Maybe Int
-getFirstIndex ra@(ResizeArray { anchorIndex }) =
+index :: forall a. ResizeArray a -> Int -> Maybe a
+index (ResizeArray { items }) idx = do
+  Map.lookup idx items
+
+getHeadIndex :: forall a. ResizeArray a -> Maybe Int
+getHeadIndex ra@(ResizeArray { anchorIndex }) =
   if isEmpty ra then
     Nothing
   else
@@ -56,8 +68,8 @@ getLastIndex ra@(ResizeArray { anchorIndex }) =
   else
     Just (anchorIndex + length ra)
 
-getNextFirstIndex :: forall a. ResizeArray a -> Int
-getNextFirstIndex ra@(ResizeArray { anchorIndex }) =
+getNextHeadIndex :: forall a. ResizeArray a -> Int
+getNextHeadIndex ra@(ResizeArray { anchorIndex }) =
   if isEmpty ra then
     anchorIndex + 1
   else
@@ -71,34 +83,39 @@ getNextLastIndex ra@(ResizeArray { anchorIndex }) =
     anchorIndex + 1 + length ra
 
 type IndexSnapshot a =
-  { firstIndex :: Maybe Int
+  { headIndex :: Maybe Int
   , lastIndex :: Maybe Int
-  , nextFirstIndex :: Int
+  , nextHeadIndex :: Int
   , nextLastIndex :: Int
   , items :: Array (Tuple Int a)
   }
 
-getIndexSnapshot :: forall a. ResizeArray a -> IndexSnapshot a
-getIndexSnapshot ra =
-  { firstIndex: getFirstIndex ra
+debug :: forall a. ResizeArray a -> IndexSnapshot a
+debug ra =
+  { headIndex: getHeadIndex ra
   , lastIndex: getLastIndex ra
-  , nextFirstIndex: getNextFirstIndex ra
+  , nextHeadIndex: getNextHeadIndex ra
   , nextLastIndex: getNextLastIndex ra
   , items: List.toUnfoldable (toListWithIndices ra)
   }
 
+
+debug2 :: forall a. ResizeArray a -> (Int /\  Array (Int /\ a))
+debug2 ra@(ResizeArray { anchorIndex }) =
+  anchorIndex /\ List.toUnfoldable (toListWithIndices ra)
+
+emptyAt :: forall a. Int -> ResizeArray a
+emptyAt idx = ResizeArray { items: Map.empty, anchorIndex: idx - 1 }
+
+empty :: forall a. ResizeArray a
+empty = emptyAt 0
+
 fromArrayAt :: forall a. Int -> Array a -> ResizeArray a
-fromArrayAt firstIndex arr =
-  ResizeArray
-    { items: foldlWithIndex (\idx acc val -> Map.insert (firstIndex + idx) val acc) Map.empty arr
-    , anchorIndex: firstIndex - 1
-    }
+fromArrayAt idx arr =
+  foldl snoc (emptyAt idx) arr
 
 fromArray :: forall a. Array a -> ResizeArray a
 fromArray = fromArrayAt 0
-
-empty :: forall a. ResizeArray a
-empty = fromArray []
 
 instance Show a => Show (ResizeArray a) where
   show ra@(ResizeArray { anchorIndex }) =
@@ -118,12 +135,12 @@ instance FoldableWithIndex Int ResizeArray where
   foldrWithIndex f z ra = case getLastIndex ra of
     Nothing -> z
     Just lastIndex ->
-      mkFoldWithIndex { start: lastIndex, step: \idx -> idx - 1 } f z ra
+      mkFoldWithIndex { start: lastIndex, step: (_ - 1) } f z ra
 
-  foldlWithIndex f z ra = case getFirstIndex ra of
+  foldlWithIndex f z ra = case getHeadIndex ra of
     Nothing -> z
-    Just firstIndex ->
-      mkFoldWithIndex { start: firstIndex, step: \idx -> idx + 1 } (\idx -> flip $ f idx) z ra
+    Just headIndex ->
+      mkFoldWithIndex { start: headIndex, step: (_ + 1) } (\idx -> flip $ f idx) z ra
 
   foldMapWithIndex = foldMapWithIndexDefaultL
 
@@ -139,11 +156,8 @@ instance Foldable ResizeArray where
   foldr f z = foldrWithIndex (\_ val acc -> f val acc) z
   foldl f z = foldlWithIndex (\_ acc val -> f acc val) z
 
--- getAnchorIndex :: forall a. ResizeArray a -> Int
--- getAnchorIndex (ResizeArray { anchorIndex }) = anchorIndex
-
 toListWithIndices :: forall a. ResizeArray a -> List (Tuple Int a)
-toListWithIndices ra = foldrWithIndex (\ix val acc -> List.Cons (Tuple ix val) acc) List.Nil ra
+toListWithIndices ra = foldrWithIndex (\ix val -> List.Cons (Tuple ix val)) List.Nil ra
 
 toList :: forall a. ResizeArray a -> List a
 toList ra = foldr (\val acc -> List.Cons val acc) List.Nil ra
@@ -161,94 +175,69 @@ snoc ra@(ResizeArray { items, anchorIndex }) item =
 cons :: forall a. a -> ResizeArray a -> ResizeArray a
 cons item ra@(ResizeArray { items }) =
   let
-    nextFirstIndex = getNextFirstIndex ra
+    nextHeadIndex = getNextHeadIndex ra
   in
     ResizeArray
-      { items: Map.insert nextFirstIndex item items
-      , anchorIndex: nextFirstIndex - 1
+      { items: Map.insert nextHeadIndex item items
+      , anchorIndex: nextHeadIndex - 1
       }
 
--- reindex :: forall a. Int -> ResizeArray a -> ResizeArray a
--- reindex index ra@(ResizeArray { items }) =
---   toList ra
---     # foldl snoc (fromArrayAt index [])
+reindex :: forall a. Int -> ResizeArray a -> ResizeArray a
+reindex idx ra =
+  foldl snoc (fromArrayAt idx []) (toList ra)
 
--- lookup :: forall a. Int -> ResizeArray a -> Maybe a
--- lookup index (ResizeArray { items, anchorIndex }) = do
---   Map.lookup (anchorIndex + index + 1) items
+deleteHead :: forall a. ResizeArray a -> ResizeArray a
+deleteHead ra@(ResizeArray { items, anchorIndex }) =
+  case getHeadIndex ra of
+    Nothing -> ra
+    Just headIndex -> ResizeArray
+      { items: Map.delete headIndex items
+      , anchorIndex: anchorIndex + 1
+      }
 
--- -- deleteHead :: forall a. ResizeArray a -> ResizeArray a
--- -- deleteHead ra@(ResizeArray { items, startIndex }) = case Map.lookup startIndex items of
--- --   Nothing -> ra
--- --   Just _ -> ResizeArray
--- --     { items: Map.delete startIndex items
--- --     , startIndex: startIndex + 1
--- --     }
+deleteLast :: forall a. ResizeArray a -> ResizeArray a
+deleteLast ra@(ResizeArray { items, anchorIndex }) =
+  case getLastIndex ra of
+    Nothing -> ra
+    Just lastIndex ->
+      ResizeArray
+        { items: Map.delete lastIndex items
+        , anchorIndex
+        }
 
--- -- deleteTail :: forall a. ResizeArray a -> ResizeArray a
--- -- deleteTail ra@(ResizeArray { items, startIndex }) =
--- --   case getEndIndex ra of
--- --     Nothing -> ra
--- --     Just endIndex ->
--- --       ResizeArray
--- --         { items: Map.delete endIndex items
--- --         , startIndex
--- --         }
+drop :: forall a. Int -> ResizeArray a -> ResizeArray a
+drop n ra = tailRec go { n, ra }
+  where
+  go acc | acc.n == 0 = Done acc.ra
+  go acc = Loop { n: acc.n - 1, ra: deleteHead acc.ra }
 
--- -- getStart :: forall a. ResizeArray a -> Maybe a
--- -- getStart (ResizeArray { items, startIndex }) =
--- --   Map.lookup startIndex items
+dropEnd :: forall a. Int -> ResizeArray a -> ResizeArray a
+dropEnd n ra = tailRec go { n, ra }
+  where
+  go acc | acc.n == 0 = Done acc.ra
+  go acc = Loop { n: acc.n - 1, ra: deleteLast acc.ra }
 
--- -- getEnd :: forall a. ResizeArray a -> Maybe a
--- -- getEnd ra@(ResizeArray { items }) = do
--- --   endIndex <- getEndIndex ra
--- --   Map.lookup endIndex items
+head :: forall a. ResizeArray a -> Maybe a
+head ra = case getHeadIndex ra of
+  Just headIndex -> index ra headIndex
+  Nothing -> Nothing
 
--- -- dropStart :: forall a. Int -> ResizeArray a -> ResizeArray a
--- -- dropStart n ra = tailRec go { n, ra }
--- --   where
--- --   go acc | acc.n == 0 = Done acc.ra
--- --   go acc = Loop { n: acc.n - 1, ra: deleteHead acc.ra }
+last :: forall a. ResizeArray a -> Maybe a
+last ra = case getLastIndex ra of
+  Just lastIndex -> index ra lastIndex
+  Nothing -> Nothing
 
--- -- dropEnd :: forall a. Int -> ResizeArray a -> ResizeArray a
--- -- dropEnd n ra = tailRec go { n, ra }
--- --   where
--- --   go acc | acc.n == 0 = Done acc.ra
--- --   go acc = Loop { n: acc.n - 1, ra: deleteTail acc.ra }
+dropWhile :: forall a. (a -> Boolean) -> ResizeArray a -> ResizeArray a
+dropWhile f ra = tailRec go ra
+  where
+  go acc = case head acc of
+    Just headVal | f headVal -> Loop (drop 1 acc)
+    _ -> Done acc
 
--- -- dropWhileStart :: forall a. (a -> Boolean) -> ResizeArray a -> ResizeArray a
--- -- dropWhileStart f ra = tailRec go ra
--- --   where
--- --   go acc = case getStart acc of
--- --     Just item | f item -> Loop (deleteHead acc)
--- --     _ -> Done acc
+dropEndWhile :: forall a. (a -> Boolean) -> ResizeArray a -> ResizeArray a
+dropEndWhile f ra = tailRec go ra
+  where
+  go acc = case last acc of
+    Just lastVal | f lastVal -> Loop (deleteLast acc)
+    _ -> Done acc
 
--- -- dropWhileEnd :: forall a. (a -> Boolean) -> ResizeArray a -> ResizeArray a
--- -- dropWhileEnd f ra = tailRec go ra
--- --   where
--- --   go acc = case getEnd acc of
--- --     Just item | f item -> Loop (deleteTail acc)
--- --     _ -> Done acc
-
--- -- ----
-
--- getNextTailIndex :: forall a. ResizeArray a -> Int
--- getNextTailIndex ra@(ResizeArray { anchorIndex }) = anchorIndex + length ra
-
--- getNextFirstIndex :: forall a. ResizeArray a -> Int
--- getNextFirstIndex ra@(ResizeArray { anchorIndex }) = anchorIndex
-
--- getFirstIndex :: forall a. ResizeArray a -> Maybe Int
--- getFirstIndex ra | isEmpty ra = Nothing
--- getFirstIndex ra@(ResizeArray { anchorIndex }) = Just (anchorIndex + 1)
-
--- -- getNextStartIndex :: forall a. ResizeArray a -> Int
--- -- getNextStartIndex ra@(ResizeArray { startIndex }) =
--- --   if isEmpty ra then
--- --     startIndex
--- --   else
--- --     startIndex - 1
-
--- getLastIndex :: forall a. ResizeArray a -> Maybe Int
--- getLastIndex ra | isEmpty ra = Nothing
--- getLastIndex ra@(ResizeArray { anchorIndex }) = Just (anchorIndex + length ra)

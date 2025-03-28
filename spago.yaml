@@ -1,10 +1,15 @@
 package:
   name: resize-arrays
   dependencies:
+    - argonaut
+    - codec-argonaut
     - debug
+    - foreign-object
+    - node-fs
     - ordered-collections
     - prelude
     - tuples
+    - unordered-collections
   test:
     main: Test.Main
     dependencies:
