@@ -47,9 +47,9 @@ import Effect.Ref as Ref
 import Foreign.Object (Object)
 import Foreign.Object as FO
 import Safe.Coerce (coerce)
-import Test.BenchLib (bench, benchGroup, benchGroupWith, benchSuite, benchSuiteWith, logJson, only)
+import Test.BenchLib (bench, benchGroup, benchGroup_, benchSuite, bench_, reportJson, only)
 import Test.BenchLib as BenchLib
-import Test.BenchLib.Reporters.ChartJsHtml (logChartJsHtml)
+import Test.BenchLib.Reporters.ChartJsHtml (reportChartJsHtml)
 import Test.MutArray (MutArray)
 import Test.MutArray as MutArray
 
@@ -61,18 +61,25 @@ def_ a = identity /\ a
 
 main :: Effect Unit
 main = do
-  benchSuiteWith "PureScript collections"
+  benchSuite "PureScript collections"
     ( \def -> def
         { sizes = [ 1, 10, 100, 1_000, 10_000 ]
         , count = 100
-        , logger = logChartJsHtml identity
+        , reporter = reportChartJsHtml
+            ( \def -> def
+                { colors = Map.fromFoldable
+                    [ "one" /\ "green"
+                    , "two" /\ "red"
+                    ]
+                }
+            )
         -- logChartJsHtml
         }
     )
-    [ benchGroup "simple"
-        [ bench "one" 
+    [ benchGroup_ "simple"
+        [ bench_ "one"
             (\_ -> 1)
-        , bench "two"
+        , bench_ "two"
             (\_ -> 1)
         ]
 

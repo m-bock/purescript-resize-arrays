@@ -5,20 +5,19 @@ module Test.BenchLib
   , SuiteResults
   , bench
   , benchEffect
-  , benchEffectWith
+  , benchEffect_
   , benchGroup
-  , benchGroupWith
+  , benchGroup_
   , benchSuite
-  , benchSuiteWith
-  , benchWith
+  , benchSuite_
+  , bench_
   , codecSuiteResults
-  , logJson
   , only
-  )
-  where
+  ) where
 
 import Prelude
 
+import Control.Monad.Except (ExceptT)
 import Data.Argonaut (stringifyWithIndent)
 import Data.Array (filter)
 import Data.Array as Array
@@ -34,11 +33,12 @@ import Data.Newtype (unwrap, wrap)
 import Data.Profunctor (dimap)
 import Data.String as Str
 import Data.Time.Duration (Milliseconds(..))
-import Data.Traversable (for, sum)
+import Data.Traversable (for, for_, sum)
 import Data.Tuple.Nested ((/\))
 import Data.Unfoldable (replicate)
 import Data.Unfoldable1 (replicate1A)
 import Effect (Effect)
+import Effect.Aff (Aff)
 import Effect.Class.Console as Console
 import Effect.Now (now)
 import Record as R
@@ -89,13 +89,39 @@ type Group = MayOnly
 type SuiteOpts =
   { sizes :: Array Int
   , count :: Int
-  , logger :: SuiteResults -> Effect Unit
+  , reporters :: Array Reporter
   }
+
+type Reporter =
+  { onSuiteStart :: String -> Effect Unit
+  , onGroupStart :: String -> Effect Unit
+  , onBenchStart :: String -> Effect Unit
+  , onGroupFinish :: GroupResults -> Effect Unit
+  , onSuiteFinish :: SuiteResults -> Effect Unit
+  , onBenchFinish :: BenchResult -> Effect Unit
+  }
+
+---
+
+newtype BenchM a = BenchM (ExceptT String Aff a)
+
+derive instance Functor BenchM
+
+derive newtype instance Apply BenchM
+
+derive newtype instance Applicative BenchM
+
+derive newtype instance Bind BenchM
+
+derive newtype instance Monad BenchM
+
+---
 
 type GroupOpts =
   { sizes :: Array Int
   , count :: Int
   , check :: forall a. Eq a => Array a -> Effect Unit
+  , reporters :: Array Reporter
   }
 
 type BenchOpts input result output =
@@ -116,14 +142,15 @@ defaultBenchSuiteOpts :: SuiteOpts
 defaultBenchSuiteOpts =
   { sizes: [ 1, 10, 100, 1_000, 10_000 ]
   , count: 1000
-  , logger: logJson
+  , reporters: [ reportConsole ]
   }
 
 mkDefaultGroupOpts :: SuiteOpts -> GroupOpts
-mkDefaultGroupOpts { sizes, count } =
+mkDefaultGroupOpts { sizes, count, reporters } =
   { sizes
   , count
   , check: checkEq
+  , reporters
   }
 
 mkDefaultBenchOpts :: forall c. GroupOpts -> BenchOpts Unit c c
@@ -136,14 +163,8 @@ mkDefaultBenchOpts { count } =
 toJsonStr :: SuiteResults -> String
 toJsonStr = stringifyWithIndent 2 <<< CA.encode codecSuiteResults
 
-logJson :: SuiteResults -> Effect Unit
-logJson results = Console.log $ toJsonStr results
-
-benchSuite :: String -> Array Group -> Effect Unit
-benchSuite groupName benchmarks = benchSuiteWith groupName identity benchmarks
-
-benchSuiteWith :: String -> (SuiteOpts -> SuiteOpts) -> Array Group -> Effect Unit
-benchSuiteWith suiteName mkOpts groups_ = do
+benchSuite :: String -> (SuiteOpts -> SuiteOpts) -> Array Group -> Effect Unit
+benchSuite suiteName mkOpts groups_ = do
   let opts = mkOpts defaultBenchSuiteOpts
 
   let groups = mayGetOnlies groups_
@@ -153,10 +174,8 @@ benchSuiteWith suiteName mkOpts groups_ = do
     group.run (mkDefaultGroupOpts opts)
 
   let results = { suiteName, groups: groupResults }
-  opts.logger results
 
-benchGroup :: forall @a. Eq a => Show a => String -> Array (Bench a) -> Group
-benchGroup groupName benches = benchGroupWith groupName (\{ sizes, count, check } -> { sizes, count, check: \_ -> pure unit }) benches
+  for_ opts.reporters \reporter -> reporter.onSuiteFinish results
 
 mayGetOnlies :: forall a. Array (MayOnly a) -> Array a
 mayGetOnlies mayOnlies =
@@ -168,8 +187,8 @@ mayGetOnlies mayOnlies =
 checkResults :: forall r a. Array { benchName :: String, output :: a | r } -> Effect Unit
 checkResults _ = unsafeCoerce 1
 
-benchGroupWith :: forall @a. Eq a => Show a => String -> (GroupOpts -> GroupOpts) -> Array (Bench a) -> Group
-benchGroupWith groupName mkOpts benches_ = notOnly
+benchGroup :: forall @a. Eq a => Show a => String -> (GroupOpts -> GroupOpts) -> Array (Bench a) -> Group
+benchGroup groupName mkOpts benches_ = notOnly
   { groupName
   , run: \defOpts -> do
 
@@ -216,11 +235,8 @@ only { val } = { val, only: true }
 --   let duration = unwrap (unInstant endTime) - unwrap (unInstant startTime)
 --   pure (result /\ Milliseconds duration)
 
-benchEffect :: String -> (Unit -> Effect Unit) -> Bench Unit
-benchEffect name benchFn = benchEffectWith name identity benchFn
-
-benchEffectWith :: forall a b c. Eq c => String -> (BenchOpts Unit c c -> BenchOpts a b c) -> (a -> Effect b) -> Bench c
-benchEffectWith benchName mkOpts benchFn = notOnly
+benchEffect :: forall a b c. Eq c => String -> (BenchOpts Unit c c -> BenchOpts a b c) -> (a -> Effect b) -> Bench c
+benchEffect benchName mkOpts benchFn = notOnly
   { benchName
   , run: \defOpts size -> do
 
@@ -254,11 +270,8 @@ benchEffectWith benchName mkOpts benchFn = notOnly
         }
   }
 
-benchWith :: forall a b c. Eq c => String -> (BenchOpts Unit c c -> BenchOpts a b c) -> (a -> b) -> Bench c
-benchWith name mkOpts benchFn = benchEffectWith name mkOpts (pure <<< benchFn)
-
-bench :: forall x. Eq x => String -> (Unit -> x) -> Bench x
-bench name benchFn = benchWith name identity (\x -> benchFn x)
+bench :: forall a b c. Eq c => String -> (BenchOpts Unit c c -> BenchOpts a b c) -> (a -> b) -> Bench c
+bench name mkOpts benchFn = benchEffect name mkOpts (pure <<< benchFn)
 
 --- Utils ---
 
@@ -289,3 +302,29 @@ codecBenchResult = CAR.object "BenchResult"
 
 codecMilliseconds :: JsonCodec Milliseconds
 codecMilliseconds = dimap unwrap wrap CA.number
+
+---
+
+benchSuite_ :: String -> Array Group -> Effect Unit
+benchSuite_ groupName benchmarks = benchSuite groupName identity benchmarks
+
+benchGroup_ :: forall @a. Eq a => Show a => String -> Array (Bench a) -> Group
+benchGroup_ groupName benches = benchGroup groupName (\opt -> opt { check = \_ -> pure unit }) benches
+
+benchEffect_ :: String -> (Unit -> Effect Unit) -> Bench Unit
+benchEffect_ name benchFn = benchEffect name identity benchFn
+
+bench_ :: forall x. Eq x => String -> (Unit -> x) -> Bench x
+bench_ name benchFn = bench name identity (\x -> benchFn x)
+
+---
+
+reportConsole :: Reporter
+reportConsole =
+  { onSuiteStart: \name -> Console.log ("Starting suite: " <> name)
+  , onGroupStart: \name -> Console.log ("Starting group: " <> name)
+  , onBenchStart: \name -> Console.log ("Starting bench: " <> name)
+  , onGroupFinish: \_ -> pure unit
+  , onSuiteFinish: \_ -> pure unit
+  , onBenchFinish: \_ -> pure unit
+  }

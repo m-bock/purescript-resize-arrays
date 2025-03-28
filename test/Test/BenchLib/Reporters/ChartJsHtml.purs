@@ -51,8 +51,8 @@ defaultOpts =
   { colors: Map.empty
   }
 
-logChartJsHtml :: (Opts -> Opts) -> SuiteResults -> Effect Unit
-logChartJsHtml mkOpts suiteResults = do
+reportChartJsHtml :: (Opts -> Opts) -> SuiteResults -> Effect Unit
+reportChartJsHtml mkOpts suiteResults = do
   let opts = mkOpts defaultOpts
   template <- FS.readTextFile UTF8 "test/Test/BenchLib/Reporters/template.html"
 
