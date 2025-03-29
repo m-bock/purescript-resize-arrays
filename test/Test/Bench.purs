@@ -3,19 +3,14 @@ module Test.Bench where
 import Prelude
 
 import Control.Monad.Error.Class (throwError)
-import Control.Monad.ST as ST
 import Data.Argonaut (stringifyWithIndent)
-import Data.Array (replicate)
 import Data.Array as Array
-import Data.Array.NonEmpty (NonEmptyArray)
-import Data.Array.NonEmpty as NEA
-import Data.Array.ST as STArray
 import Data.Codec.Argonaut (JsonCodec)
 import Data.Codec.Argonaut as CA
 import Data.Codec.Argonaut.Common as CACommon
 import Data.Codec.Argonaut.Record as CARecord
 import Data.DateTime.Instant (unInstant)
-import Data.Foldable (all, foldr)
+import Data.Foldable (all)
 import Data.FoldableWithIndex (foldlWithIndex)
 import Data.Int as Int
 import Data.List as List
@@ -30,10 +25,8 @@ import Data.Number.Format as NumFmt
 import Data.Ord (abs)
 import Data.Profunctor (dimap)
 import Data.ResizeArray as RA
-import Data.Time (Millisecond)
 import Data.Time.Duration (Milliseconds(..))
-import Data.Traversable (foldl, for, for_, sequence, sum)
-import Data.Tuple (fst, snd)
+import Data.Traversable (for, for_, sequence, sum)
 import Data.Tuple.Nested (type (/\), (/\))
 import Data.Unfoldable (range)
 import Data.Unfoldable1 (replicate1A)
@@ -47,66 +40,74 @@ import Effect.Ref as Ref
 import Foreign.Object (Object)
 import Foreign.Object as FO
 import Safe.Coerce (coerce)
-import Test.BenchLib (bench, benchGroup, benchGroup_, benchSuite, bench_, reportJson, only)
-import Test.BenchLib as BenchLib
-import Test.BenchLib.Reporters.ChartJsHtml (reportChartJsHtml)
-import Test.MutArray (MutArray)
+import Test.BenchLib (bench, benchAff, benchGroup_, benchSuite, bench_, run)
+import Test.BenchLib.Reporters.ChartJsHtml (reportChartJs, reportChartJs_)
+import Test.BenchLib.Reporters.Json (reportJson_)
 import Test.MutArray as MutArray
 
-def :: forall cfg a. (cfg -> cfg) -> Array a -> ((cfg -> cfg) /\ Array a)
-def f a = f /\ a
-
-def_ :: forall cfg a. Array a -> ((cfg -> cfg) /\ Array a)
-def_ a = identity /\ a
-
 main :: Effect Unit
-main = do
+main = run $
   benchSuite "PureScript collections"
     ( \def -> def
-        { sizes = [ 1, 10, 100, 1_000, 10_000 ]
-        , count = 100
-        , reporter = reportChartJsHtml
-            ( \def -> def
-                { colors = Map.fromFoldable
-                    [ "one" /\ "green"
-                    , "two" /\ "red"
-                    ]
-                }
-            )
-        -- logChartJsHtml
+        { sizes = [ 25_000, 50_000, 100_000 ]
+        , count = 1000
+        , reporters = def.reporters <>
+            [ reportJson_
+            , reportChartJs
+                ( \def -> def
+                    { colors = Map.fromFoldable 
+                        [ 
+                        ]
+
+                    }
+                )
+            ]
         }
     )
     [ benchGroup_ "simple"
-        [ bench_ "one"
-            (\_ -> 1)
+        [ bench "one" (\def -> def { prepare = \size -> "", finalize = \_ -> 's' })
+            (\(x) -> 1)
         , bench_ "two"
-            (\_ -> 1)
+            (\_ -> 's')
         ]
 
-    -- , benchGroup "Delete first item" (\def -> def)
-    --     [ bench "RA.drop"
-    --         ( \def -> def
-    --             { prepare = \n -> pure $ RA.fromArray $ range 1 n
-    --             , finalize = pure <<< List.toUnfoldable <<< RA.toList :: _ -> _ (Array _)
-    --             }
-    --         )
-    --         (\(xs) -> RA.drop 1 xs)
+    , benchGroup_ "Delete first item"
+        [ bench "RA.drop"
+            ( \def -> def
+                { prepare = RA.fromArray <<< range 1
+                , finalize = RA.toArray
+                }
+            )
+            (\xs -> RA.drop 1 xs)
 
-    --     , bench "Array.drop"
-    --         ( \def -> def
-    --             { prepare = \n -> pure $ range 1 n
-    --             , finalize = pure :: _ -> _
-    --             }
-    --         )
-    --         (\xs -> Array.drop 1 xs)
+        , bench "Array.drop"
+            ( \def -> def
+                { prepare = range 1
+                }
+            )
+            (\xs -> Array.drop 1 xs)
 
-    --     , bench "List.drop"
-    --         ( \def -> def
-    --             { prepare = \n -> pure $ range 1 n
-    --             , finalize = pure <<< List.toUnfoldable :: _ -> _ (Array _)
-    --             }
-    --         )
-    --         (\xs -> List.drop 1 xs)
+        , bench "List.drop"
+            ( \def -> def
+                { prepare = range 1
+                , finalize = List.toUnfoldable
+                }
+            )
+            (\xs -> List.drop 1 xs)
+
+        , benchAff "MutArray.shift"
+            ( \def -> def
+                { prepare = pure <<< MutArray.fromArray <<< range 1
+                , finalize = pure <<< MutArray.toArray
+                }
+            )
+            (\xs -> do
+                -- MutArray.shift xs
+                (MutArray.fromArray []) -- xs
+            )
+        ]
+
+    
 
     --     -- , bench "MutArray.shift"
     --     --     ( \def -> def

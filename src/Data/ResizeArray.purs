@@ -19,6 +19,7 @@ module Data.ResizeArray
   , length
   , reindex
   , snoc
+  , toArray
   , toList
   , toListWithIndices
   )
@@ -161,6 +162,9 @@ toListWithIndices ra = foldrWithIndex (\ix val -> List.Cons (Tuple ix val)) List
 
 toList :: forall a. ResizeArray a -> List a
 toList ra = foldr (\val acc -> List.Cons val acc) List.Nil ra
+
+toArray :: forall a. ResizeArray a -> Array a
+toArray = List.toUnfoldable <<< toList
 
 snoc :: forall a. ResizeArray a -> a -> ResizeArray a
 snoc ra@(ResizeArray { items, anchorIndex }) item =
