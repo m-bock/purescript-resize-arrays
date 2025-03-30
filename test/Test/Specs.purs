@@ -112,8 +112,6 @@ spec = do
         `shouldEqual`
           [ 'a', 'b', 'c' ]
 
-  ---
-
   describe "foldr" do
     it "accumulates from right to left" do
       foldr (\val acc -> acc <> [ val ]) [] (RA.fromArray [ 'a', 'b', 'c' ])
