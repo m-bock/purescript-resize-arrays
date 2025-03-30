@@ -28,7 +28,7 @@ main = BenchLib.run $
           )
       ]
   in
-    benchSuite "PureScript collections"
+    benchSuite "PureScript collections CPU Benchmarks"
       ( \def -> def
           { sizes = [ 0, 20_000, 40_000, 60_000, 80_000, 100_000 ]
           , iterations = 1000
