@@ -26,7 +26,6 @@ package:
     location:
       githubOwner: m-bock
       githubRepo: purescript-resize-arrays
-      subdir: lib
 
 workspace:
   packageSet:
