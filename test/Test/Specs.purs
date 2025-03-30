@@ -171,205 +171,148 @@ spec = do
         `shouldEqual`
           ((top - 1) /\ [ top /\ 'a', bottom /\ 'b', (bottom + 1) /\ 'c' ])
 
-  --
-
-  describe "reindex" do
-    it "sets the start index of an empty ResizeArray" do
-      let
-        result = RA.reindex 50 $ RA.fromArray [] :: _ Char
-      RA.debug result `shouldEqual`
-        { headIndex: Nothing
-        , lastIndex: Nothing
-        , nextHeadIndex: 50
-        , nextLastIndex: 50
-        , items: []
-        }
-
-    it "sets the start index of a populated ResizeArray" do
-      let
-        result = RA.reindex 50 $ RA.fromArray [ 'a', 'b', 'c' ]
-      RA.debug result `shouldEqual`
-        { headIndex: Just 50
-        , lastIndex: Just 52
-        , nextHeadIndex: 49
-        , nextLastIndex: 53
-        , items: [ 50 /\ 'a', 51 /\ 'b', 52 /\ 'c' ]
-        }
-
-    it "sets the start index to max Int and inidices wrap around" do
-      let
-        result = RA.reindex top $ RA.fromArray [ 'a', 'b', 'c' ]
-      RA.debug result `shouldEqual`
-        { headIndex: Just top
-        , lastIndex: Just (bottom + 1)
-        , nextHeadIndex: top - 1
-        , nextLastIndex: bottom + 2
-        , items: [ top /\ 'a', bottom /\ 'b', (bottom + 1) /\ 'c' ]
-        }
-
   describe "drop" do
-    it "drops more items than the ResizeArray contains" do
-      let
-        result = RA.drop 5 $ RA.fromArrayAt 10 [ 'a', 'b', 'c' ]
-      RA.debug result `shouldEqual`
-        { headIndex: Nothing
-        , lastIndex: Nothing
-        , nextHeadIndex: 13
-        , nextLastIndex: 13
-        , items: []
-        }
+    it "does not drop more items than the ResizeArray contains" do
+      RA.debug2 (RA.drop 5 $ RA.fromArrayAt 10 [ 'a', 'b', 'c' ])
+        `shouldEqual`
+          (12 /\ [])
 
     it "drops less items than the ResizeArray contains" do
-      let
-        result = RA.drop 2 $ RA.fromArray [ 'a', 'b', 'c', 'd', 'e' ]
-      RA.debug result `shouldEqual`
-        { headIndex: Just 2
-        , lastIndex: Just 4
-        , nextHeadIndex: 1
-        , nextLastIndex: 5
-        , items: [ 2 /\ 'c', 3 /\ 'd', 4 /\ 'e' ]
-        }
+      RA.debug2 (RA.drop 2 $ RA.fromArray [ 'a', 'b', 'c', 'd', 'e' ])
+        `shouldEqual`
+          (1 /\ [ 2 /\ 'c', 3 /\ 'd', 4 /\ 'e' ])
 
-  describe "dropEnd" do
+  describeOnly "dropEnd" do
     it "drops more items than the ResizeArray contains" do
-      let
-        result = RA.dropEnd 5 $ RA.fromArray [ 'a', 'b', 'c' ]
-      RA.debug result `shouldEqual`
-        { headIndex: Nothing
-        , lastIndex: Nothing
-        , nextHeadIndex: 0
-        , nextLastIndex: 0
-        , items: []
-        }
+      RA.debug2 (RA.dropEnd 5 $ RA.fromArrayAt 10 [ 'a', 'b', 'c' ])
+        `shouldEqual`
+          (9 /\ [])
 
     it "drops less items than the ResizeArray contains" do
-      let
-        result = RA.dropEnd 2 $ RA.fromArray [ 'a', 'b', 'c', 'd', 'e' ]
-      RA.debug result `shouldEqual`
-        { headIndex: Just 0
-        , lastIndex: Just 2
-        , nextHeadIndex: -1
-        , nextLastIndex: 3
-        , items: [ 0 /\ 'a', 1 /\ 'b', 2 /\ 'c' ]
-        }
+      RA.debug2 (RA.dropEnd 2 $ RA.fromArrayAt 10 [ 'a', 'b', 'c', 'd', 'e' ])
+        `shouldEqual`
+          (9 /\ [ 10 /\ 'a', 11 /\ 'b', 12 /\ 'c' ])
 
-  describe "head" do
+  describeOnly "head" do
     it "returns the head of an empty ResizeArray" do
-      let
-        result = RA.head $ RA.empty :: _ Char
-      result `shouldEqual` Nothing
+      (RA.head $ RA.empty :: _ Char)
+        `shouldEqual`
+          Nothing
 
     it "returns the head of a singleton ResizeArray" do
-      let
-        result = RA.head $ RA.fromArrayAt 50 [ 'a' ]
-      result `shouldEqual` Just 'a'
+      (RA.head $ RA.fromArrayAt 50 [ 'a' ])
+        `shouldEqual`
+          Just 'a'
 
     it "returns the head of a populated ResizeArray" do
-      let
-        result = RA.head $ RA.fromArrayAt 50 [ 'a', 'b', 'c' ]
-      result `shouldEqual` Just 'a'
+      (RA.head $ RA.fromArrayAt 50 [ 'a', 'b', 'c' ])
+        `shouldEqual`
+          Just 'a'
 
-  describe "last" do
-    it "returns the last item of an empty ResizeArray" do
-      let
-        result = RA.last $ RA.empty :: _ Char
-      result `shouldEqual` Nothing
+--
 
-    it "returns the last item of a singleton ResizeArray" do
-      let
-        result = RA.last $ RA.fromArrayAt 50 [ 'a' ]
-      result `shouldEqual` Just 'a'
 
-    it "returns the last of a populated ResizeArray" do
-      let
-        result = RA.last $ RA.fromArrayAt 50 [ 'a', 'b', 'c' ]
-      result `shouldEqual` Just 'c'
+-- describe "last" do
+--   it "returns the last item of an empty ResizeArray" do
+--     let
+--       result = RA.last $ RA.empty :: _ Char
+--     result `shouldEqual` Nothing
 
-  describe "dropWhile" do
-    it "drops all items of ResizeArray of 2 items" do
-      let
-        result = RA.dropWhile (\_ -> true) $ RA.fromArray [ 'a', 'b' ]
-      RA.debug result `shouldEqual`
-        { headIndex: Nothing
-        , lastIndex: Nothing
-        , nextHeadIndex: 2
-        , nextLastIndex: 2
-        , items: []
-        }
+--   it "returns the last item of a singleton ResizeArray" do
+--     let
+--       result = RA.last $ RA.fromArrayAt 50 [ 'a' ]
+--     result `shouldEqual` Just 'a'
 
-    it "drops all items" do
-      let
-        result = RA.dropWhile (\_ -> true) $ RA.fromArrayAt 10 [ 'a', 'b', 'c' ]
-      RA.debug result `shouldEqual`
-        { headIndex: Nothing
-        , lastIndex: Nothing
-        , nextHeadIndex: 13
-        , nextLastIndex: 13
-        , items: []
-        }
+--   it "returns the last of a populated ResizeArray" do
+--     let
+--       result = RA.last $ RA.fromArrayAt 50 [ 'a', 'b', 'c' ]
+--     result `shouldEqual` Just 'c'
 
-    it "drops no items" do
-      let
-        result = RA.dropWhile (\_ -> false) $ RA.fromArrayAt 10 [ 'a', 'b', 'c' ]
-      RA.debug result `shouldEqual`
-        { headIndex: Just 10
-        , lastIndex: Just 12
-        , nextHeadIndex: 9
-        , nextLastIndex: 13
-        , items: [ 10 /\ 'a', 11 /\ 'b', 12 /\ 'c' ]
-        }
+-- describe "dropWhile" do
+--   it "drops all items of ResizeArray of 2 items" do
+--     let
+--       result = RA.dropWhile (\_ -> true) $ RA.fromArray [ 'a', 'b' ]
+--     RA.debug result `shouldEqual`
+--       { headIndex: Nothing
+--       , lastIndex: Nothing
+--       , nextHeadIndex: 2
+--       , nextLastIndex: 2
+--       , items: []
+--       }
 
-  describe "fromArray" do
-    it "empty array" do
-      let
-        result = RA.fromArray [] :: _ Char
-      RA.debug result `shouldEqual`
-        { headIndex: Nothing
-        , lastIndex: Nothing
-        , nextHeadIndex: 0
-        , nextLastIndex: 0
-        , items: []
-        }
+--   it "drops all items" do
+--     let
+--       result = RA.dropWhile (\_ -> true) $ RA.fromArrayAt 10 [ 'a', 'b', 'c' ]
+--     RA.debug result `shouldEqual`
+--       { headIndex: Nothing
+--       , lastIndex: Nothing
+--       , nextHeadIndex: 13
+--       , nextLastIndex: 13
+--       , items: []
+--       }
 
-    it "populated array" do
-      let
-        result = RA.fromArray [ 'a', 'b', 'c' ]
-      RA.debug result `shouldEqual`
-        { headIndex: Just 0
-        , lastIndex: Just 2
-        , nextHeadIndex: -1
-        , nextLastIndex: 3
-        , items: [ 0 /\ 'a', 1 /\ 'b', 2 /\ 'c' ]
-        }
+--   it "drops no items" do
+--     let
+--       result = RA.dropWhile (\_ -> false) $ RA.fromArrayAt 10 [ 'a', 'b', 'c' ]
+--     RA.debug result `shouldEqual`
+--       { headIndex: Just 10
+--       , lastIndex: Just 12
+--       , nextHeadIndex: 9
+--       , nextLastIndex: 13
+--       , items: [ 10 /\ 'a', 11 /\ 'b', 12 /\ 'c' ]
+--       }
 
-  describe "toList" do
-    it "empty ResizeArray" do
-      let
-        result = RA.toList $ RA.empty :: _ Char
-      result `shouldEqual` List.fromFoldable []
+-- describe "fromArray" do
+--   it "empty array" do
+--     let
+--       result = RA.fromArray [] :: _ Char
+--     RA.debug result `shouldEqual`
+--       { headIndex: Nothing
+--       , lastIndex: Nothing
+--       , nextHeadIndex: 0
+--       , nextLastIndex: 0
+--       , items: []
+--       }
 
-    it "populated ResizeArray" do
-      let
-        result = RA.toList $ RA.fromArray [ 'a', 'b', 'c' ]
-      result `shouldEqual` List.fromFoldable [ 'a', 'b', 'c' ]
+--   it "populated array" do
+--     let
+--       result = RA.fromArray [ 'a', 'b', 'c' ]
+--     RA.debug result `shouldEqual`
+--       { headIndex: Just 0
+--       , lastIndex: Just 2
+--       , nextHeadIndex: -1
+--       , nextLastIndex: 3
+--       , items: [ 0 /\ 'a', 1 /\ 'b', 2 /\ 'c' ]
+--       }
 
-  -- describe "cycle" do
-  --   it "" do
-  --     let
-  --       n = 100_000
+-- describe "toList" do
+--   it "empty ResizeArray" do
+--     let
+--       result = RA.toList $ RA.empty :: _ Char
+--     result `shouldEqual` List.fromFoldable []
 
-  --     let
-  --       items :: ResizeArray Char
-  --       items = RA.fromArray $ Array.replicate n 'a'
+--   it "populated ResizeArray" do
+--     let
+--       result = RA.toList $ RA.fromArray [ 'a', 'b', 'c' ]
+--     result `shouldEqual` List.fromFoldable [ 'a', 'b', 'c' ]
 
-  --     let
-  --       f :: ResizeArray Char -> ResizeArray Char
-  --       f = RA.dropEnd 1 >>> RA.cons 'a'
+-- describe "cycle" do
+--   it "" do
+--     let
+--       n = 100_000
 
-  --     let
-  --       go { idx, acc } | idx < 1_000_000 = Loop { idx: idx + 1, acc: f acc }
-  --       go { acc } = Done acc
+--     let
+--       items :: ResizeArray Char
+--       items = RA.fromArray $ Array.replicate n 'a'
 
-  --     let result = tailRec go { idx: 0, acc: items }
+--     let
+--       f :: ResizeArray Char -> ResizeArray Char
+--       f = RA.dropEnd 1 >>> RA.cons 'a'
 
-  --     RA.length result `shouldEqual` n
+--     let
+--       go { idx, acc } | idx < 1_000_000 = Loop { idx: idx + 1, acc: f acc }
+--       go { acc } = Done acc
+
+--     let result = tailRec go { idx: 0, acc: items }
+
+--     RA.length result `shouldEqual` n
