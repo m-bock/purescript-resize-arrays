@@ -35,10 +35,8 @@ import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
 import Data.Tuple.Nested (type (/\), (/\))
 
-type Map a b = HashMap a b
-
 newtype ResizeArray a = ResizeArray
-  { items :: Map Int a
+  { items :: HashMap Int a
   , anchorIndex :: Int -- The index before the head element
   }
 
