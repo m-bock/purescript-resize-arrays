@@ -13,17 +13,16 @@ import Effect (Effect)
 import Test.BenchLib (bench, benchGroup_, benchM, benchSuite)
 import Test.BenchLib as BenchLib
 import Test.BenchLib.Reporters.ChartJsHtml (reportChartJs)
-import Test.BenchLib.Reporters.Json (reportJson_)
 import Test.MutArray as MutArray
 
 main :: Effect Unit
 main = BenchLib.run $
   let
     reporters =
-      [ reportJson_
-      , reportChartJs
+      [ reportChartJs
           ( \def -> def
-              { lineStyles =
+              { filePath = "docs/benchmarks.html"
+              , lineStyles =
                   mapWithIndex (\ix val -> val { opacity = if ix == 0 then 1.0 else 0.3 }) def.lineStyles
               }
           )

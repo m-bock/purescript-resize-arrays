@@ -1,0 +1,2645 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PureScript collections</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        margin: 0;
+        padding: 0;
+        padding-bottom: 20px;
+      }
+      h2 {
+        margin: 0;
+        padding: 0;
+        padding-bottom: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <script>
+      /* config start */
+      const config = {
+        data: {
+          groups: [
+            {
+              benchs: [
+                {
+                  benchName: "ResizeArray.drop",
+                  duration: 0.009,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "Array.drop",
+                  duration: 0.002,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "List.drop",
+                  duration: 0.002,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "MutArray.shift",
+                  duration: 0.002,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "ResizeArray.drop",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "Array.drop",
+                  duration: 0.016,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "List.drop",
+                  duration: 0.002,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "MutArray.shift",
+                  duration: 0.003,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "ResizeArray.drop",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "Array.drop",
+                  duration: 0.104,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "List.drop",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "MutArray.shift",
+                  duration: 0.008,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "ResizeArray.drop",
+                  duration: 0.002,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "Array.drop",
+                  duration: 0.142,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "List.drop",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "MutArray.shift",
+                  duration: 0.006,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "ResizeArray.drop",
+                  duration: 0.004,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "Array.drop",
+                  duration: 0.185,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "List.drop",
+                  duration: 0.003,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "MutArray.shift",
+                  duration: 0.006,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "ResizeArray.drop",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "Array.drop",
+                  duration: 0.221,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "List.drop",
+                  duration: 0.002,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "MutArray.shift",
+                  duration: 0.009,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "ResizeArray.drop",
+                  duration: 0.003,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "Array.drop",
+                  duration: 0.265,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "List.drop",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "MutArray.shift",
+                  duration: 0.01,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "ResizeArray.drop",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "Array.drop",
+                  duration: 0.306,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "List.drop",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "MutArray.shift",
+                  duration: 0.019,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "ResizeArray.drop",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "Array.drop",
+                  duration: 0.35,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "List.drop",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "MutArray.shift",
+                  duration: 0.018,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "ResizeArray.drop",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "Array.drop",
+                  duration: 0.388,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "List.drop",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "MutArray.shift",
+                  duration: 0.025,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "ResizeArray.drop",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "Array.drop",
+                  duration: 0.466,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "List.drop",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "MutArray.shift",
+                  duration: 0.025,
+                  iterations: 1000,
+                  size: 100000,
+                },
+              ],
+              groupName: "Delete first item",
+            },
+            {
+              benchs: [
+                {
+                  benchName: "ResizeArray.dropEnd",
+                  duration: 0.003,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "Array.dropEnd",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "List.dropEnd",
+                  duration: 0.002,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "MutArray.pop",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "ResizeArray.dropEnd",
+                  duration: 0.012,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "Array.dropEnd",
+                  duration: 0.01,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "List.dropEnd",
+                  duration: 0.544,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "MutArray.pop",
+                  duration: 0.002,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "ResizeArray.dropEnd",
+                  duration: 0.012,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "Array.dropEnd",
+                  duration: 0.1,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "List.dropEnd",
+                  duration: 0.768,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "MutArray.pop",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "ResizeArray.dropEnd",
+                  duration: 0.024,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "Array.dropEnd",
+                  duration: 0.146,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "List.dropEnd",
+                  duration: 1.362,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "MutArray.pop",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "ResizeArray.dropEnd",
+                  duration: 0.087,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "Array.dropEnd",
+                  duration: 0.21,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "List.dropEnd",
+                  duration: 1.493,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "MutArray.pop",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "ResizeArray.dropEnd",
+                  duration: 0.267,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "Array.dropEnd",
+                  duration: 0.246,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "List.dropEnd",
+                  duration: 1.697,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "MutArray.pop",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "ResizeArray.dropEnd",
+                  duration: 0.413,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "Array.dropEnd",
+                  duration: 0.306,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "List.dropEnd",
+                  duration: 2.517,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "MutArray.pop",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "ResizeArray.dropEnd",
+                  duration: 0.665,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "Array.dropEnd",
+                  duration: 0.309,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "List.dropEnd",
+                  duration: 4.438,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "MutArray.pop",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "ResizeArray.dropEnd",
+                  duration: 0.848,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "Array.dropEnd",
+                  duration: 0.343,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "List.dropEnd",
+                  duration: 4.096,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "MutArray.pop",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "ResizeArray.dropEnd",
+                  duration: 0.37,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "Array.dropEnd",
+                  duration: 0.405,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "List.dropEnd",
+                  duration: 3.847,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "MutArray.pop",
+                  duration: 0.002,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "ResizeArray.dropEnd",
+                  duration: 0.434,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "Array.dropEnd",
+                  duration: 0.455,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "List.dropEnd",
+                  duration: 3.805,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "MutArray.pop",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 100000,
+                },
+              ],
+              groupName: "Delete last item",
+            },
+            {
+              benchs: [
+                {
+                  benchName: "ResizeArray.cons",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "Array.cons",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "List.cons",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "MutArray.unshift",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "ResizeArray.cons",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "Array.cons",
+                  duration: 0.011,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "List.cons",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "MutArray.unshift",
+                  duration: 0.011,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "ResizeArray.cons",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "Array.cons",
+                  duration: 0.108,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "List.cons",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "MutArray.unshift",
+                  duration: 0.142,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "ResizeArray.cons",
+                  duration: 0.002,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "Array.cons",
+                  duration: 0.153,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "List.cons",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "MutArray.unshift",
+                  duration: 0.202,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "ResizeArray.cons",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "Array.cons",
+                  duration: 0.2,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "List.cons",
+                  duration: 0.003,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "MutArray.unshift",
+                  duration: 0.287,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "ResizeArray.cons",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "Array.cons",
+                  duration: 0.242,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "List.cons",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "MutArray.unshift",
+                  duration: 0.321,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "ResizeArray.cons",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "Array.cons",
+                  duration: 0.296,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "List.cons",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "MutArray.unshift",
+                  duration: 0.449,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "ResizeArray.cons",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "Array.cons",
+                  duration: 0.333,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "List.cons",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "MutArray.unshift",
+                  duration: 0.455,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "ResizeArray.cons",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "Array.cons",
+                  duration: 0.377,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "List.cons",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "MutArray.unshift",
+                  duration: 0.594,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "ResizeArray.cons",
+                  duration: 0.002,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "Array.cons",
+                  duration: 0.425,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "List.cons",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "MutArray.unshift",
+                  duration: 0.612,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "ResizeArray.cons",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "Array.cons",
+                  duration: 0.469,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "List.cons",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "MutArray.unshift",
+                  duration: 0.672,
+                  iterations: 1000,
+                  size: 100000,
+                },
+              ],
+              groupName: "Add item to start",
+            },
+            {
+              benchs: [
+                {
+                  benchName: "ResizeArray.snoc",
+                  duration: 0.002,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "Array.snoc",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "List.snoc",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "MutArray.push",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "ResizeArray.snoc",
+                  duration: 0.012,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "Array.snoc",
+                  duration: 0.024,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "List.snoc",
+                  duration: 0.82,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "MutArray.push",
+                  duration: 0.01,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "ResizeArray.snoc",
+                  duration: 0.014,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "Array.snoc",
+                  duration: 0.26,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "List.snoc",
+                  duration: 1.867,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "MutArray.push",
+                  duration: 0.188,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "ResizeArray.snoc",
+                  duration: 0.014,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "Array.snoc",
+                  duration: 0.402,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "List.snoc",
+                  duration: 3.4,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "MutArray.push",
+                  duration: 0.229,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "ResizeArray.snoc",
+                  duration: 0.092,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "Array.snoc",
+                  duration: 0.505,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "List.snoc",
+                  duration: 5.145,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "MutArray.push",
+                  duration: 0.312,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "ResizeArray.snoc",
+                  duration: 0.202,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "Array.snoc",
+                  duration: 0.562,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "List.snoc",
+                  duration: 4.934,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "MutArray.push",
+                  duration: 0.427,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "ResizeArray.snoc",
+                  duration: 0.341,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "Array.snoc",
+                  duration: 0.697,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "List.snoc",
+                  duration: 8.904,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "MutArray.push",
+                  duration: 0.43,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "ResizeArray.snoc",
+                  duration: 0.428,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "Array.snoc",
+                  duration: 0.812,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "List.snoc",
+                  duration: 11.094,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "MutArray.push",
+                  duration: 0.465,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "ResizeArray.snoc",
+                  duration: 0.413,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "Array.snoc",
+                  duration: 0.923,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "List.snoc",
+                  duration: 13.568,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "MutArray.push",
+                  duration: 0.594,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "ResizeArray.snoc",
+                  duration: 0.461,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "Array.snoc",
+                  duration: 1.002,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "List.snoc",
+                  duration: 15.469,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "MutArray.push",
+                  duration: 0.531,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "ResizeArray.snoc",
+                  duration: 0.461,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "Array.snoc",
+                  duration: 1.124,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "List.snoc",
+                  duration: 20.065,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "MutArray.push",
+                  duration: 0.624,
+                  iterations: 1000,
+                  size: 100000,
+                },
+              ],
+              groupName: "Add item to end",
+            },
+            {
+              benchs: [
+                {
+                  benchName: "map (ResizeArray)",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "map (Array)",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "map (List)",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "MutArray.map",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "map (ResizeArray)",
+                  duration: 0.126,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "map (Array)",
+                  duration: 0.082,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "map (List)",
+                  duration: 0.204,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "MutArray.map",
+                  duration: 0.042,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "map (ResizeArray)",
+                  duration: 0.218,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "map (Array)",
+                  duration: 0.25,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "map (List)",
+                  duration: 0.401,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "MutArray.map",
+                  duration: 0.22,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "map (ResizeArray)",
+                  duration: 0.331,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "map (Array)",
+                  duration: 0.375,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "map (List)",
+                  duration: 0.586,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "MutArray.map",
+                  duration: 0.414,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "map (ResizeArray)",
+                  duration: 0.824,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "map (Array)",
+                  duration: 0.519,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "map (List)",
+                  duration: 1.002,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "MutArray.map",
+                  duration: 0.665,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "map (ResizeArray)",
+                  duration: 1.197,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "map (Array)",
+                  duration: 0.605,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "map (List)",
+                  duration: 1.085,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "MutArray.map",
+                  duration: 0.776,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "map (ResizeArray)",
+                  duration: 1.791,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "map (Array)",
+                  duration: 0.712,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "map (List)",
+                  duration: 1.107,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "MutArray.map",
+                  duration: 1.085,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "map (ResizeArray)",
+                  duration: 2.274,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "map (Array)",
+                  duration: 0.887,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "map (List)",
+                  duration: 1.777,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "MutArray.map",
+                  duration: 0.943,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "map (ResizeArray)",
+                  duration: 2.37,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "map (Array)",
+                  duration: 0.946,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "map (List)",
+                  duration: 2.505,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "MutArray.map",
+                  duration: 1.568,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "map (ResizeArray)",
+                  duration: 2.459,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "map (Array)",
+                  duration: 1.04,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "map (List)",
+                  duration: 2.766,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "MutArray.map",
+                  duration: 1.603,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "map (ResizeArray)",
+                  duration: 2.454,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "map (Array)",
+                  duration: 1.186,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "map (List)",
+                  duration: 2.078,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "MutArray.map",
+                  duration: 1.706,
+                  iterations: 1000,
+                  size: 100000,
+                },
+              ],
+              groupName: "map over items",
+            },
+            {
+              benchs: [
+                {
+                  benchName: "foldl (ResizeArray)",
+                  duration: 0.003,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "foldl (Array)",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "foldl (List)",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "MutArray.foldl",
+                  duration: 0.002,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "foldl (ResizeArray)",
+                  duration: 1.375,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "foldl (Array)",
+                  duration: 0.219,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "foldl (List)",
+                  duration: 0.296,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "MutArray.foldl",
+                  duration: 0.011,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "foldl (ResizeArray)",
+                  duration: 2.865,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "foldl (Array)",
+                  duration: 0.412,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "foldl (List)",
+                  duration: 0.575,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "MutArray.foldl",
+                  duration: 0.007,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "foldl (ResizeArray)",
+                  duration: 4.724,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "foldl (Array)",
+                  duration: 0.701,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "foldl (List)",
+                  duration: 0.906,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "MutArray.foldl",
+                  duration: 0.03,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "foldl (ResizeArray)",
+                  duration: 6.555,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "foldl (Array)",
+                  duration: 0.795,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "foldl (List)",
+                  duration: 1.168,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "MutArray.foldl",
+                  duration: 0.03,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "foldl (ResizeArray)",
+                  duration: 9.485,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "foldl (Array)",
+                  duration: 1.003,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "foldl (List)",
+                  duration: 1.468,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "MutArray.foldl",
+                  duration: 0.038,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "foldl (ResizeArray)",
+                  duration: 13.624,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "foldl (Array)",
+                  duration: 1.214,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "foldl (List)",
+                  duration: 1.821,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "MutArray.foldl",
+                  duration: 0.058,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "foldl (ResizeArray)",
+                  duration: 17.586,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "foldl (Array)",
+                  duration: 1.486,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "foldl (List)",
+                  duration: 2.35,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "MutArray.foldl",
+                  duration: 0.062,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "foldl (ResizeArray)",
+                  duration: 19.182,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "foldl (Array)",
+                  duration: 1.637,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "foldl (List)",
+                  duration: 2.35,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "MutArray.foldl",
+                  duration: 0.072,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "foldl (ResizeArray)",
+                  duration: 22.739,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "foldl (Array)",
+                  duration: 1.836,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "foldl (List)",
+                  duration: 2.763,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "MutArray.foldl",
+                  duration: 0.107,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "foldl (ResizeArray)",
+                  duration: 24.708,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "foldl (Array)",
+                  duration: 2.136,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "foldl (List)",
+                  duration: 3.429,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "MutArray.foldl",
+                  duration: 0.28,
+                  iterations: 1000,
+                  size: 100000,
+                },
+              ],
+              groupName: "foldl over items",
+            },
+            {
+              benchs: [
+                {
+                  benchName: "foldr (ResizeArray)",
+                  duration: 0.002,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "foldr (Array)",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "foldr (List)",
+                  duration: 0.002,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "MutArray.foldr",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "foldr (ResizeArray)",
+                  duration: 1.335,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "foldr (Array)",
+                  duration: 0.241,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "foldr (List)",
+                  duration: 0.708,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "MutArray.foldr",
+                  duration: 0.054,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "foldr (ResizeArray)",
+                  duration: 2.705,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "foldr (Array)",
+                  duration: 0.477,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "foldr (List)",
+                  duration: 1.551,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "MutArray.foldr",
+                  duration: 0.121,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "foldr (ResizeArray)",
+                  duration: 4.242,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "foldr (Array)",
+                  duration: 0.661,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "foldr (List)",
+                  duration: 2.553,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "MutArray.foldr",
+                  duration: 0.153,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "foldr (ResizeArray)",
+                  duration: 6.197,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "foldr (Array)",
+                  duration: 0.946,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "foldr (List)",
+                  duration: 3.507,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "MutArray.foldr",
+                  duration: 0.192,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "foldr (ResizeArray)",
+                  duration: 8.888,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "foldr (Array)",
+                  duration: 1.108,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "foldr (List)",
+                  duration: 4.638,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "MutArray.foldr",
+                  duration: 0.227,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "foldr (ResizeArray)",
+                  duration: 12.97,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "foldr (Array)",
+                  duration: 1.416,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "foldr (List)",
+                  duration: 5.706,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "MutArray.foldr",
+                  duration: 0.286,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "foldr (ResizeArray)",
+                  duration: 15.957,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "foldr (Array)",
+                  duration: 1.609,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "foldr (List)",
+                  duration: 7.667,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "MutArray.foldr",
+                  duration: 0.312,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "foldr (ResizeArray)",
+                  duration: 18.237,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "foldr (Array)",
+                  duration: 1.815,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "foldr (List)",
+                  duration: 9.437,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "MutArray.foldr",
+                  duration: 0.371,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "foldr (ResizeArray)",
+                  duration: 21.038,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "foldr (Array)",
+                  duration: 2.048,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "foldr (List)",
+                  duration: 11.117,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "MutArray.foldr",
+                  duration: 0.426,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "foldr (ResizeArray)",
+                  duration: 23.357,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "foldr (Array)",
+                  duration: 2.273,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "foldr (List)",
+                  duration: 13.491,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "MutArray.foldr",
+                  duration: 0.493,
+                  iterations: 1000,
+                  size: 100000,
+                },
+              ],
+              groupName: "foldr over items",
+            },
+            {
+              benchs: [
+                {
+                  benchName: "ResizeArray.index",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "Array.index",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "List.index",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "MutArray.peek",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "ResizeArray.index",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "Array.index",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "List.index",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "MutArray.peek",
+                  duration: 0.002,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "ResizeArray.index",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "Array.index",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "List.index",
+                  duration: 0.002,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "MutArray.peek",
+                  duration: 0.003,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "ResizeArray.index",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "Array.index",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "List.index",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "MutArray.peek",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "ResizeArray.index",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "Array.index",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "List.index",
+                  duration: 0.003,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "MutArray.peek",
+                  duration: 0.002,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "ResizeArray.index",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "Array.index",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "List.index",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "MutArray.peek",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "ResizeArray.index",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "Array.index",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "List.index",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "MutArray.peek",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "ResizeArray.index",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "Array.index",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "List.index",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "MutArray.peek",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "ResizeArray.index",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "Array.index",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "List.index",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "MutArray.peek",
+                  duration: 0.003,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "ResizeArray.index",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "Array.index",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "List.index",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "MutArray.peek",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "ResizeArray.index",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "Array.index",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "List.index",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "MutArray.peek",
+                  duration: 0.002,
+                  iterations: 1000,
+                  size: 100000,
+                },
+              ],
+              groupName: "item lookup",
+            },
+            {
+              benchs: [
+                {
+                  benchName: "ResizeArray.length",
+                  duration: 0.002,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "Array.length",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "List.length",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "MutArray.length",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 0,
+                },
+                {
+                  benchName: "ResizeArray.length",
+                  duration: 0.009,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "Array.length",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "List.length",
+                  duration: 0.277,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "MutArray.length",
+                  duration: 0.002,
+                  iterations: 1000,
+                  size: 10000,
+                },
+                {
+                  benchName: "ResizeArray.length",
+                  duration: 0.012,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "Array.length",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "List.length",
+                  duration: 0.583,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "MutArray.length",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 20000,
+                },
+                {
+                  benchName: "ResizeArray.length",
+                  duration: 0.011,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "Array.length",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "List.length",
+                  duration: 0.875,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "MutArray.length",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 30000,
+                },
+                {
+                  benchName: "ResizeArray.length",
+                  duration: 0.182,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "Array.length",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "List.length",
+                  duration: 1.049,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "MutArray.length",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 40000,
+                },
+                {
+                  benchName: "ResizeArray.length",
+                  duration: 0.196,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "Array.length",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "List.length",
+                  duration: 0.823,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "MutArray.length",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 50000,
+                },
+                {
+                  benchName: "ResizeArray.length",
+                  duration: 0.316,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "Array.length",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "List.length",
+                  duration: 0.503,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "MutArray.length",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 60000,
+                },
+                {
+                  benchName: "ResizeArray.length",
+                  duration: 0.442,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "Array.length",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "List.length",
+                  duration: 0.816,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "MutArray.length",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 70000,
+                },
+                {
+                  benchName: "ResizeArray.length",
+                  duration: 0.396,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "Array.length",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "List.length",
+                  duration: 0.705,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "MutArray.length",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 80000,
+                },
+                {
+                  benchName: "ResizeArray.length",
+                  duration: 0.398,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "Array.length",
+                  duration: 0.001,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "List.length",
+                  duration: 1.046,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "MutArray.length",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 90000,
+                },
+                {
+                  benchName: "ResizeArray.length",
+                  duration: 0.403,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "Array.length",
+                  duration: 0,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "List.length",
+                  duration: 0.824,
+                  iterations: 1000,
+                  size: 100000,
+                },
+                {
+                  benchName: "MutArray.length",
+                  duration: 0.002,
+                  iterations: 1000,
+                  size: 100000,
+                },
+              ],
+              groupName: "size",
+            },
+          ],
+          suiteName: "PureScript collections",
+        },
+        lineStyles: [
+          {
+            color: {
+              b: 132,
+              g: 99,
+              r: 255,
+            },
+            opacity: 1,
+            width: 2,
+          },
+          {
+            color: {
+              b: 235,
+              g: 162,
+              r: 54,
+            },
+            opacity: 0.3,
+            width: 2,
+          },
+          {
+            color: {
+              b: 255,
+              g: 102,
+              r: 153,
+            },
+            opacity: 0.3,
+            width: 2,
+          },
+          {
+            color: {
+              b: 64,
+              g: 159,
+              r: 255,
+            },
+            opacity: 0.3,
+            width: 2,
+          },
+          {
+            color: {
+              b: 132,
+              g: 99,
+              r: 255,
+            },
+            opacity: 0.3,
+            width: 2,
+          },
+          {
+            color: {
+              b: 235,
+              g: 162,
+              r: 54,
+            },
+            opacity: 0.3,
+            width: 2,
+          },
+          {
+            color: {
+              b: 86,
+              g: 206,
+              r: 255,
+            },
+            opacity: 0.3,
+            width: 2,
+          },
+          {
+            color: {
+              b: 192,
+              g: 192,
+              r: 75,
+            },
+            opacity: 0.3,
+            width: 2,
+          },
+          {
+            color: {
+              b: 255,
+              g: 102,
+              r: 153,
+            },
+            opacity: 0.3,
+            width: 2,
+          },
+          {
+            color: {
+              b: 64,
+              g: 159,
+              r: 255,
+            },
+            opacity: 0.3,
+            width: 2,
+          },
+        ],
+      };
+      /* config end */
+
+      function renderCharts(dataConfig) {
+        const container = document.createElement("div");
+        container.style.maxWidth = "600px";
+        container.style.margin = "0 auto";
+        container.style.padding = "20px";
+
+        const header = document.createElement("h1");
+        header.textContent = dataConfig.suiteName;
+        container.appendChild(header);
+
+        document.body.appendChild(container);
+
+        dataConfig.groups.forEach((group, groupIndex) => {
+          const chartContainer = document.createElement("div");
+          chartContainer.style.marginBottom = "40px";
+
+          const title = document.createElement("h2");
+          title.textContent = group.groupName;
+          chartContainer.appendChild(title);
+
+          const canvas = document.createElement("canvas");
+          canvas.id = `chart-${groupIndex}`;
+          chartContainer.appendChild(canvas);
+
+          container.appendChild(chartContainer);
+
+          const labels = [...new Set(group.benchs.map((bench) => bench.size))];
+
+          const datasets = Object.values(
+            group.benchs.reduce((acc, bench, index) => {
+              if (!acc[bench.benchName]) {
+                const style =
+                  config.lineStyles[index % config.lineStyles.length];
+                const rgbaColor = `rgba(${style.color.r}, ${style.color.g}, ${style.color.b}, ${style.opacity})`;
+
+                acc[bench.benchName] = {
+                  label: bench.benchName,
+                  data: [],
+                  borderColor: rgbaColor,
+                  borderWidth: style.width,
+                  backgroundColor: rgbaColor,
+                  fill: false,
+                  tension: 0.1,
+                };
+              }
+              acc[bench.benchName].data.push(bench.duration);
+              return acc;
+            }, {})
+          );
+
+          new Chart(canvas.getContext("2d"), {
+            type: "line",
+            data: {
+              labels: labels,
+              datasets: datasets,
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: {
+                  display: true,
+                },
+              },
+              scales: {
+                x: {
+                  type: "linear",
+                  title: {
+                    display: true,
+                    text: "Input Size",
+                  },
+                },
+                y: {
+                  max: (ctx) => {
+                    const maxValue = Math.max(
+                      ...ctx.chart.data.datasets.flatMap((ds) => ds.data)
+                    );
+                    return Math.max(maxValue, 10);
+                  },
+                  title: {
+                    display: true,
+
+                    text: "Average Time (milliseconds)",
+                  },
+                },
+              },
+            },
+          });
+        });
+      }
+
+      renderCharts(config.data);
+    </script>
+  </body>
+</html>
