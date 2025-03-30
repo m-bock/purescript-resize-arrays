@@ -22,8 +22,7 @@ foreign import popImpl :: forall a. EffectFn1 (MutArray a) Unit
 
 foreign import pushImpl :: forall a. EffectFn2 a (MutArray a) Unit
 
-
-foreign import foldlImpl ::  forall a b. EffectFn3 (Fn2 b a b) b (MutArray a) b
+foreign import foldlImpl :: forall a b. EffectFn3 (Fn2 b a b) b (MutArray a) b
 
 foreign import foldrImpl :: forall a b. EffectFn3 (Fn2 a b b) b (MutArray a) b
 
@@ -32,7 +31,6 @@ foreign import lengthImpl :: forall a. MutArray a -> Int
 foreign import mapImpl :: forall a b. EffectFn2 (a -> b) (MutArray a) (MutArray b)
 
 foreign import lookupImpl :: forall a. EffectFn2 Int (MutArray a) (Nullable a)
-
 
 fromArray :: forall a. Array a -> Effect (MutArray a)
 fromArray = runEffectFn1 fromArrayImpl
@@ -65,6 +63,6 @@ map :: forall a b. (a -> b) -> MutArray a -> Effect (MutArray b)
 map = runEffectFn2 mapImpl
 
 lookup :: forall a. Int -> MutArray a -> Effect (Maybe a)
-lookup n items =  do
+lookup n items = do
   a <- runEffectFn2 lookupImpl n items
   pure $ toMaybe a

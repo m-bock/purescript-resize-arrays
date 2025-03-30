@@ -2,11 +2,10 @@ module Test.Util where
 
 import Prelude
 
-import Control.Monad.ST (run)
 import Data.Map as Map
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(..))
 import Effect (Effect)
-import Effect.Ref (modify_, new, read, modify)
+import Effect.Ref (modify_, new, read)
 
 memoizeEffect :: forall a b. Ord a => (a -> Effect b) -> Effect (a -> Effect b)
 memoizeEffect f = do
