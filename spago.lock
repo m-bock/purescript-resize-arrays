@@ -5,13 +5,27 @@
         "path": "./",
         "core": {
           "dependencies": [
-            "foldable-traversable",
-            "lists",
-            "maybe",
-            "prelude",
-            "tailrec",
-            "tuples",
-            "unordered-collections"
+            {
+              "foldable-traversable": ">=6.0.0 <7.0.0"
+            },
+            {
+              "lists": ">=7.0.0 <8.0.0"
+            },
+            {
+              "maybe": ">=6.0.0 <7.0.0"
+            },
+            {
+              "prelude": ">=6.0.2 <7.0.0"
+            },
+            {
+              "tailrec": ">=6.1.0 <7.0.0"
+            },
+            {
+              "tuples": ">=7.0.0 <8.0.0"
+            },
+            {
+              "unordered-collections": ">=3.1.0 <4.0.0"
+            }
           ],
           "build_plan": [
             "arrays",
