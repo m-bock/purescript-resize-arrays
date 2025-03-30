@@ -18,8 +18,7 @@ module Test.BenchLib
   , reportConsole
   , run
   , toAff
-  )
-  where
+  ) where
 
 import Prelude
 
@@ -36,7 +35,6 @@ import Data.Newtype (unwrap)
 import Data.String as Str
 import Data.Time.Duration (Milliseconds(..))
 import Data.Traversable (for, for_, sum)
-import Data.Tuple (snd)
 import Data.Tuple.Nested (type (/\), (/\))
 import Data.Unfoldable (replicate)
 import Data.Unfoldable1 (replicate1A)
@@ -48,7 +46,6 @@ import Effect.Now (now)
 import Effect.Ref as Ref
 import Record as R
 import Safe.Coerce (coerce)
-import Unsafe.Coerce (unsafeCoerce)
 
 type Size = Int
 
@@ -61,27 +58,27 @@ type MayOnly a = { only :: Boolean, val :: a }
 --- Opts
 
 type SuiteOpts =
-  { sizes :: Array Int
-  , count :: Int
+  { sizes :: Array Size
+  , iterations :: Int
   , reporters :: Array Reporter
   }
 
 type GroupOpts =
   { sizes :: Array Int
-  , count :: Int
+  , iterations :: Int
   , check :: forall a. Eq a => Array a -> Boolean
   , reporters :: Array Reporter
   }
 
-type BenchOptsAff m input result output =
-  { count :: Int
+type BenchOptsAff (m :: Type -> Type) input result output =
+  { iterations :: Int
   , prepare :: Size -> m input
   , finalize :: result -> m output
   , reporters :: Array Reporter
   }
 
 type BenchOptsPure input result output =
-  { count :: Int
+  { iterations :: Int
   , prepare :: Size -> input
   , finalize :: result -> output
   , reporters :: Array Reporter
@@ -103,7 +100,7 @@ type BenchResult =
   { benchName :: String
   , size :: Size
   , duration :: Milliseconds
-  , count :: Int
+  , iterations :: Int
   }
 
 ---
@@ -134,6 +131,7 @@ type Reporter =
   , onGroupFinish :: GroupResults -> Effect Unit
   , onSizeFinish :: Size -> Effect Unit
   , onBenchFinish :: BenchResult -> Effect Unit
+  , onCheckResults :: { success :: Boolean, results :: Array { benchName :: String, output :: String } } -> Effect Unit
   }
 
 run :: Suite -> Effect Unit
@@ -145,9 +143,10 @@ notOnly :: forall a. a -> MayOnly a
 notOnly a = { only: false, val: a }
 
 checkEq :: forall a. Eq a => Array a -> Boolean
-checkEq items = 
+checkEq items =
   let
     first = Array.head items
+
     checkEq' :: a -> Boolean
     checkEq' x = Array.all (_ == x) items
   in
@@ -160,21 +159,21 @@ checkEq items =
 defaultSuiteOpts :: SuiteOpts
 defaultSuiteOpts =
   { sizes: [ 1, 10, 100, 1_000, 10_000 ]
-  , count: 1000
+  , iterations: 1000
   , reporters: [ reportConsole ]
   }
 
 mkDefaultGroupOpts :: SuiteOpts -> GroupOpts
-mkDefaultGroupOpts { sizes, count, reporters } =
+mkDefaultGroupOpts { sizes, iterations, reporters } =
   { sizes
-  , count
+  , iterations
   , check: checkEq
   , reporters
   }
 
 mkDefaultBenchOpts :: forall c. GroupOpts -> BenchOptsPure Unit c c
-mkDefaultBenchOpts { count, reporters } =
-  { count
+mkDefaultBenchOpts { iterations, reporters } =
+  { iterations
   , prepare: \_ -> unit
   , finalize: identity
   , reporters
@@ -197,7 +196,6 @@ benchSuite suiteName mkOpts groups_ =
       runReporters opts.reporters \rep -> rep.onSuiteStart suiteName
 
       groupResults <- for groups \group -> do
-        --liftEffect $ Console.error group.groupName
         group.run (mkDefaultGroupOpts opts)
 
       let results = { suiteName, groups: groupResults }
@@ -225,19 +223,16 @@ benchGroup groupName mkOpts benches_ = notOnly
 
             resultsPerBench <- for benches
               ( \{ benchName, run } -> do
-                  --Console.error (pad 10 (show size) <> " " <> benchName)
-
                   let benchOpts = mkDefaultBenchOpts groupOpts
-                  { duration, count } /\ output <- run benchOpts size
+                  { duration, iterations } /\ output <- run benchOpts size
 
-                  pure ({ benchName, duration, count } /\ output)
+                  pure ({ benchName, duration, iterations } /\ output)
               )
 
+
+            checkResults groupOpts (map (\({ benchName } /\ output) -> { benchName, output }) resultsPerBench)
+
             runReporters groupOpts.reporters \rep -> rep.onSizeFinish size
-
-
-            unless (checkEq (map snd resultsPerBench)) do
-              throwError (error "Benchmarks results are not equal")
 
             pure (map (\(r /\ _) -> R.merge r { size }) resultsPerBench)
         )
@@ -263,11 +258,11 @@ benchImpl benchName mkOpts benchFn = notOnly
   { benchName
   , run: \defOpts size -> do
 
-      let opts@{ count } = mkOpts defOpts
+      let opts@{ iterations } = mkOpts defOpts
 
       runReporters opts.reporters \rep -> rep.onBenchStart benchName
 
-      durs :: NonEmptyList _ <- replicate1A count do
+      durs :: NonEmptyList _ <- replicate1A iterations do
 
         input :: a <- toAff $ opts.prepare size
 
@@ -280,7 +275,7 @@ benchImpl benchName mkOpts benchFn = notOnly
 
       let
         benchResult =
-          { count
+          { iterations
           , duration
           , size
           , benchName
@@ -297,8 +292,8 @@ benchImpl benchName mkOpts benchFn = notOnly
   }
 
 benchOptsPureToAff :: forall @m a b c. Applicative m => BenchOptsPure a b c -> BenchOptsAff m a b c
-benchOptsPureToAff { count, prepare, finalize, reporters } =
-  { count
+benchOptsPureToAff { iterations, prepare, finalize, reporters } =
+  { iterations
   , prepare: \size -> pure $ prepare size
   , finalize: \result -> pure $ finalize result
   , reporters
@@ -323,8 +318,21 @@ mayGetOnlies mayOnlies =
   in
     map _.val $ if Array.null onlys then mayOnlies else onlys
 
-checkResults :: forall r a. Array { benchName :: String, output :: a | r } -> Effect Unit
-checkResults _ = unsafeCoerce 1
+checkResults :: forall r a. Show a => Eq a => GroupOpts -> Array { benchName :: String, output :: a | r } -> Aff Unit
+checkResults groupOpts results_ =
+  if (groupOpts.check (map _.output results_)) then do
+    runReporters groupOpts.reporters \rep -> rep.onCheckResults
+      { success: true
+      , results
+      }
+  else do
+    runReporters groupOpts.reporters \rep -> rep.onCheckResults
+      { success: false
+      , results
+      }
+    throwError (error "Benchmarks results are not equal")
+  where
+  results = map (\({ benchName, output }) -> { benchName, output: show output }) results_
 
 pad :: Int -> String -> String
 pad n str = Str.joinWith "" (replicate (n - Str.length str) ".") <> str
@@ -332,7 +340,7 @@ pad n str = Str.joinWith "" (replicate (n - Str.length str) ".") <> str
 only :: forall a. MayOnly a -> MayOnly a
 only { val } = { val, only: true }
 
-measureTime :: forall a m . MonadEffect m => (Unit -> m a) -> m (a /\ Milliseconds)
+measureTime :: forall a m. MonadEffect m => (Unit -> m a) -> m (a /\ Milliseconds)
 measureTime action = do
   startTime <- liftEffect now
   result <- action unit
@@ -351,7 +359,7 @@ benchSuite_ :: String -> Array Group -> Suite
 benchSuite_ groupName benchmarks = benchSuite groupName identity benchmarks
 
 benchGroup_ :: forall @a. Eq a => Show a => String -> Array (Bench a) -> Group
-benchGroup_ groupName benches = benchGroup groupName (\opt -> opt { check = \_ -> false }) benches
+benchGroup_ groupName benches = benchGroup groupName identity benches
 
 ---
 
@@ -359,8 +367,14 @@ reportConsole :: Reporter
 reportConsole = defaultReporter
   { onSuiteStart = \name -> Console.error ("• suite: " <> name)
   , onGroupStart = \name -> Console.error ("  • group: " <> name)
-  , onSizeStart = \size -> Console.error  ("    • size: " <> show size)
+  , onSizeStart = \size -> Console.error ("    • size: " <> show size)
   , onBenchStart = \name -> Console.error ("      • bench: " <> name)
+  , onCheckResults = \{ success, results } -> do
+      if success then
+        Console.error ("      • check: ✓")
+      else do
+        Console.error ("       • check: ✗")
+        for_ results \{ benchName, output } -> Console.error ("          • " <> benchName <> ": " <> output)
   }
 
 defaultReporter :: Reporter
@@ -373,6 +387,7 @@ defaultReporter =
   , onGroupFinish: const $ pure unit
   , onSizeFinish: const $ pure unit
   , onBenchFinish: const $ pure unit
+  , onCheckResults: const $ pure unit
   }
 
 memoizeEffect :: forall a b. Ord a => (a -> b) -> Effect (a -> Effect b)

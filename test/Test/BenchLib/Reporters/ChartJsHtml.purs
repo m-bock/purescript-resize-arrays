@@ -61,8 +61,6 @@ defaultOpts =
   { lineStyles:
       [ { color: { r: 255, g: 99, b: 132 }, opacity, width }
       , { color: { r: 54, g: 162, b: 235 }, opacity, width }
-      --, { color: { r: 255, g: 206, b: 86 }, opacity, width }
-      --, { color: { r: 75, g: 192, b: 192 }, opacity, width }
       , { color: { r: 153, g: 102, b: 255 }, opacity, width }
       , { color: { r: 255, g: 159, b: 64 }, opacity, width }
       , { color: { r: 255, g: 99, b: 132 }, opacity, width }
@@ -72,7 +70,7 @@ defaultOpts =
       , { color: { r: 153, g: 102, b: 255 }, opacity, width }
       , { color: { r: 255, g: 159, b: 64 }, opacity, width }
       ]
-  , filePath: "bench.html"
+  , filePath: "bench-results.html"
   }
   where
     opacity = 0.5
@@ -81,8 +79,6 @@ defaultOpts =
 writeHtml :: Opts -> SuiteResults -> Effect Unit
 writeHtml opts suiteResults = do
   template <- FS.readTextFile UTF8 "test/Test/BenchLib/Reporters/template.html"
-
-  let regex = unsafeRegex "(/\\* config start \\*/)([\\s\\S]*)(/\\* config end \\*/)" noFlags
 
   let
     config =
@@ -95,7 +91,7 @@ writeHtml opts suiteResults = do
   let
     replacements =
       [ { regex: unsafeRegex "{{title}}" noFlags
-        , replacement: "title"
+        , replacement: suiteResults.suiteName
         }
       , { regex: unsafeRegex "(/\\* config start \\*/)([\\s\\S]*)(/\\* config end \\*/)" noFlags
         , replacement: "$1\n" <> (indent "      " ("const config = " <> jsonStr)) <> "\n" <> "      $3"

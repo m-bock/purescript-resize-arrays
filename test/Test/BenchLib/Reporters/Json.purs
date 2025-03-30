@@ -59,7 +59,7 @@ codecBenchResult = CAR.object "BenchResult"
   { benchName: CA.string
   , size: CA.int
   , duration: codecMilliseconds
-  , count: CA.int
+  , iterations: CA.int
   }
 
 codecMilliseconds :: JsonCodec Milliseconds

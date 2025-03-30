@@ -2,6 +2,7 @@ module Test.MutArray where
 
 import Prelude
 
+import Data.Function.Uncurried (Fn2, mkFn2)
 import Data.Maybe (Maybe)
 import Data.Nullable (Nullable, toMaybe)
 import Effect (Effect)
@@ -22,9 +23,9 @@ foreign import popImpl :: forall a. EffectFn1 (MutArray a) Unit
 foreign import pushImpl :: forall a. EffectFn2 a (MutArray a) Unit
 
 
-foreign import foldlImpl ::  forall a b. EffectFn3 (b -> a -> b) b (MutArray a) b
+foreign import foldlImpl ::  forall a b. EffectFn3 (Fn2 b a b) b (MutArray a) b
 
-foreign import foldrImpl :: forall a b. EffectFn3 (a -> b -> b) b (MutArray a) b
+foreign import foldrImpl :: forall a b. EffectFn3 (Fn2 a b b) b (MutArray a) b
 
 foreign import lengthImpl :: forall a. MutArray a -> Int
 
@@ -52,10 +53,10 @@ push :: forall a. a -> MutArray a -> Effect Unit
 push = runEffectFn2 pushImpl
 
 foldl :: forall a b. (b -> a -> b) -> b -> MutArray a -> Effect b
-foldl = runEffectFn3 foldlImpl
+foldl f acc items = runEffectFn3 foldlImpl (mkFn2 f) acc items
 
 foldr :: forall a b. (a -> b -> b) -> b -> MutArray a -> Effect b
-foldr = runEffectFn3 foldrImpl
+foldr f acc items = runEffectFn3 foldrImpl (mkFn2 f) acc items
 
 length :: forall a. MutArray a -> Int
 length = lengthImpl
