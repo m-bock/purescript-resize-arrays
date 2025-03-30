@@ -1,6 +1,5 @@
 module Data.ResizeArray
-  ( IndexSnapshot
-  , ResizeArray
+  ( ResizeArray
   , cons
   , debug
   , drop
@@ -80,14 +79,6 @@ getNextLastIndex ra@(ResizeArray { anchorIndex }) =
     anchorIndex + 1
   else
     anchorIndex + 1 + length ra
-
-type IndexSnapshot a =
-  { headIndex :: Maybe Int
-  , lastIndex :: Maybe Int
-  , nextHeadIndex :: Int
-  , nextLastIndex :: Int
-  , items :: Array (Tuple Int a)
-  }
 
 debug :: forall a. ResizeArray a -> (Int /\ Array (Int /\ a))
 debug ra@(ResizeArray { anchorIndex }) =
