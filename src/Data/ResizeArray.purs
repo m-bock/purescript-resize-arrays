@@ -3,7 +3,6 @@ module Data.ResizeArray
   , ResizeArray
   , cons
   , debug
-  , debug2
   , drop
   , dropEnd
   , dropEndWhile
@@ -22,8 +21,7 @@ module Data.ResizeArray
   , toArray
   , toList
   , toListWithIndices
-  )
-  where
+  ) where
 
 import Prelude
 
@@ -91,18 +89,8 @@ type IndexSnapshot a =
   , items :: Array (Tuple Int a)
   }
 
-debug :: forall a. ResizeArray a -> IndexSnapshot a
-debug ra =
-  { headIndex: getHeadIndex ra
-  , lastIndex: getLastIndex ra
-  , nextHeadIndex: getNextHeadIndex ra
-  , nextLastIndex: getNextLastIndex ra
-  , items: List.toUnfoldable (toListWithIndices ra)
-  }
-
-
-debug2 :: forall a. ResizeArray a -> (Int /\  Array (Int /\ a))
-debug2 ra@(ResizeArray { anchorIndex }) =
+debug :: forall a. ResizeArray a -> (Int /\ Array (Int /\ a))
+debug ra@(ResizeArray { anchorIndex }) =
   anchorIndex /\ List.toUnfoldable (toListWithIndices ra)
 
 emptyAt :: forall a. Int -> ResizeArray a
