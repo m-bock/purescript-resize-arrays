@@ -5,39 +5,47 @@ module Test.BenchLib
   , Size
   , SuiteResults
   , bench
-  , benchAff
-  , benchAff_
+  , benchM
+  , benchM_
   , benchGroup
   , benchGroup_
   , benchSuite
   , benchSuite_
   , bench_
+  , class MonadBench
   , defaultReporter
   , only
   , reportConsole
   , run
-  ) where
+  , toAff
+  )
+  where
 
 import Prelude
 
+import Control.Monad.Error.Class (throwError)
 import Data.Array (filter)
 import Data.Array as Array
 import Data.DateTime.Instant (unInstant)
 import Data.Int as Int
 import Data.List.NonEmpty as NEL
 import Data.List.Types (NonEmptyList)
+import Data.Map as Map
+import Data.Maybe (Maybe(..))
 import Data.Newtype (unwrap)
 import Data.String as Str
 import Data.Time.Duration (Milliseconds(..))
 import Data.Traversable (for, for_, sum)
+import Data.Tuple (snd)
 import Data.Tuple.Nested (type (/\), (/\))
 import Data.Unfoldable (replicate)
 import Data.Unfoldable1 (replicate1A)
 import Effect (Effect)
-import Effect.Aff (Aff, launchAff_)
-import Effect.Class (liftEffect)
+import Effect.Aff (Aff, error, launchAff_)
+import Effect.Class (class MonadEffect, liftEffect)
 import Effect.Class.Console as Console
 import Effect.Now (now)
+import Effect.Ref as Ref
 import Record as R
 import Safe.Coerce (coerce)
 import Unsafe.Coerce (unsafeCoerce)
@@ -61,14 +69,14 @@ type SuiteOpts =
 type GroupOpts =
   { sizes :: Array Int
   , count :: Int
-  , check :: forall a. Eq a => Array a -> Aff Unit
+  , check :: forall a. Eq a => Array a -> Boolean
   , reporters :: Array Reporter
   }
 
-type BenchOptsAff input result output =
+type BenchOptsAff m input result output =
   { count :: Int
-  , prepare :: Size -> Aff input
-  , finalize :: result -> Aff output
+  , prepare :: Size -> m input
+  , finalize :: result -> m output
   , reporters :: Array Reporter
   }
 
@@ -136,8 +144,16 @@ run suite = launchAff_ $ void $ suite.run defaultSuiteOpts
 notOnly :: forall a. a -> MayOnly a
 notOnly a = { only: false, val: a }
 
-checkEq :: forall a. Eq a => Array a -> Aff Unit
-checkEq items = unsafeCoerce 1
+checkEq :: forall a. Eq a => Array a -> Boolean
+checkEq items = 
+  let
+    first = Array.head items
+    checkEq' :: a -> Boolean
+    checkEq' x = Array.all (_ == x) items
+  in
+    case first of
+      Just x -> checkEq' x
+      Nothing -> true
 
 --- Defaults
 
@@ -219,9 +235,11 @@ benchGroup groupName mkOpts benches_ = notOnly
 
             runReporters groupOpts.reporters \rep -> rep.onSizeFinish size
 
-            pure (map (\(r /\ _) -> R.merge r { size }) resultsPerBench)
 
-        --checkResults resultsPerBench
+            unless (checkEq (map snd resultsPerBench)) do
+              throwError (error "Benchmarks results are not equal")
+
+            pure (map (\(r /\ _) -> R.merge r { size }) resultsPerBench)
         )
 
       let groupResults = { groupName, benchs: join results }
@@ -231,7 +249,16 @@ benchGroup groupName mkOpts benches_ = notOnly
       pure groupResults
   }
 
-benchImpl :: forall a b c. Eq c => String -> (BenchOptsPure Unit c c -> BenchOptsAff a b c) -> (a -> Aff b) -> Bench c
+class Monad m <= MonadBench m where
+  toAff :: forall a. m a -> Aff a
+
+instance MonadBench Effect where
+  toAff = liftEffect
+
+instance MonadBench Aff where
+  toAff = identity
+
+benchImpl :: forall m a b c. Eq c => MonadBench m => String -> (BenchOptsPure Unit c c -> BenchOptsAff m a b c) -> (a -> m b) -> Bench c
 benchImpl benchName mkOpts benchFn = notOnly
   { benchName
   , run: \defOpts size -> do
@@ -242,15 +269,10 @@ benchImpl benchName mkOpts benchFn = notOnly
 
       durs :: NonEmptyList _ <- replicate1A count do
 
-        -- (result /\ duration) <- measureTime do
-        --   opts.run input
+        input :: a <- toAff $ opts.prepare size
 
-        input :: a <- opts.prepare size
-
-        startTime <- liftEffect now
-        _ <- benchFn input
-        endTime <- liftEffect now
-        let duration = Milliseconds (unwrap (unInstant endTime) - unwrap (unInstant startTime))
+        (_ /\ duration) <- measureTime \_ -> do
+          toAff $ benchFn input
 
         pure duration
 
@@ -266,7 +288,7 @@ benchImpl benchName mkOpts benchFn = notOnly
 
       runReporters opts.reporters \rep -> rep.onBenchFinish benchResult
 
-      output <- do
+      output <- toAff do
         input :: a <- opts.prepare size
         result <- benchFn input
         opts.finalize result
@@ -274,7 +296,7 @@ benchImpl benchName mkOpts benchFn = notOnly
       pure (benchResult /\ output)
   }
 
-benchOptsPureToAff :: forall a b c. BenchOptsPure a b c -> BenchOptsAff a b c
+benchOptsPureToAff :: forall @m a b c. Applicative m => BenchOptsPure a b c -> BenchOptsAff m a b c
 benchOptsPureToAff { count, prepare, finalize, reporters } =
   { count
   , prepare: \size -> pure $ prepare size
@@ -283,16 +305,16 @@ benchOptsPureToAff { count, prepare, finalize, reporters } =
   }
 
 bench :: forall a b c. Eq c => String -> (BenchOptsPure Unit c c -> BenchOptsPure a b c) -> (a -> b) -> Bench c
-bench name mkOpts benchFn = benchImpl name (benchOptsPureToAff <<< mkOpts) (pure <<< benchFn)
+bench name mkOpts benchFn = benchImpl name (benchOptsPureToAff @Effect <<< mkOpts) (pure <<< benchFn)
 
 bench_ :: forall c. Eq c => String -> (Unit -> c) -> Bench c
 bench_ name benchFn = bench name identity benchFn
 
-benchAff :: forall a b c. Eq c => String -> (BenchOptsAff Unit c c -> BenchOptsAff a b c) -> (a -> Aff b) -> Bench c
-benchAff name mkOpts benchFn = benchImpl name (mkOpts <<< benchOptsPureToAff) benchFn
+benchM :: forall m a b c. MonadBench m => Eq c => String -> (BenchOptsAff m Unit c c -> BenchOptsAff m a b c) -> (a -> m b) -> Bench c
+benchM name mkOpts benchFn = benchImpl name (mkOpts <<< benchOptsPureToAff) benchFn
 
-benchAff_ :: forall c. Eq c => String -> (Unit -> Aff c) -> Bench c
-benchAff_ name benchFn = benchAff name identity benchFn
+benchM_ :: forall m c. Eq c => MonadBench m => String -> (Unit -> m c) -> Bench c
+benchM_ name benchFn = benchM name identity benchFn
 
 mayGetOnlies :: forall a. Array (MayOnly a) -> Array a
 mayGetOnlies mayOnlies =
@@ -310,13 +332,13 @@ pad n str = Str.joinWith "" (replicate (n - Str.length str) ".") <> str
 only :: forall a. MayOnly a -> MayOnly a
 only { val } = { val, only: true }
 
--- measureTime :: forall a. Effect a -> Effect (a /\ Milliseconds)
--- measureTime action = do
---   startTime <- now
---   result <- action
---   endTime <- now
---   let duration = unwrap (unInstant endTime) - unwrap (unInstant startTime)
---   pure (result /\ Milliseconds duration)
+measureTime :: forall a m . MonadEffect m => (Unit -> m a) -> m (a /\ Milliseconds)
+measureTime action = do
+  startTime <- liftEffect now
+  result <- action unit
+  endTime <- liftEffect now
+  let duration = unwrap (unInstant endTime) - unwrap (unInstant startTime)
+  pure (result /\ Milliseconds duration)
 
 --- Utils ---
 
@@ -329,16 +351,16 @@ benchSuite_ :: String -> Array Group -> Suite
 benchSuite_ groupName benchmarks = benchSuite groupName identity benchmarks
 
 benchGroup_ :: forall @a. Eq a => Show a => String -> Array (Bench a) -> Group
-benchGroup_ groupName benches = benchGroup groupName (\opt -> opt { check = \_ -> pure unit }) benches
+benchGroup_ groupName benches = benchGroup groupName (\opt -> opt { check = \_ -> false }) benches
 
 ---
 
 reportConsole :: Reporter
 reportConsole = defaultReporter
-  { onSuiteStart = \name -> Console.error ("running suite: " <> name)
-  , onGroupStart = \name -> Console.error ("  running group: " <> name)
-  , onSizeStart = \size -> Console.error ("    running size: " <> show size)
-  , onBenchStart = \name -> Console.error ("      running bench: " <> name)
+  { onSuiteStart = \name -> Console.error ("• suite: " <> name)
+  , onGroupStart = \name -> Console.error ("  • group: " <> name)
+  , onSizeStart = \size -> Console.error  ("    • size: " <> show size)
+  , onBenchStart = \name -> Console.error ("      • bench: " <> name)
   }
 
 defaultReporter :: Reporter
@@ -353,3 +375,14 @@ defaultReporter =
   , onBenchFinish: const $ pure unit
   }
 
+memoizeEffect :: forall a b. Ord a => (a -> b) -> Effect (a -> Effect b)
+memoizeEffect f = do
+  cacheRef <- Ref.new Map.empty
+  pure \x -> do
+    cache <- Ref.read cacheRef
+    case Map.lookup x cache of
+      Just result -> pure result
+      Nothing -> do
+        let result = f x
+        Ref.modify_ (Map.insert x result) cacheRef
+        pure result

@@ -2,6 +2,8 @@ module Test.MutArray where
 
 import Prelude
 
+import Data.Maybe (Maybe)
+import Data.Nullable (Nullable, toMaybe)
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1, EffectFn2, EffectFn3, runEffectFn1, runEffectFn2, runEffectFn3)
 
@@ -22,7 +24,14 @@ foreign import pushImpl :: forall a. EffectFn2 a (MutArray a) Unit
 
 foreign import foldlImpl ::  forall a b. EffectFn3 (b -> a -> b) b (MutArray a) b
 
+foreign import foldrImpl :: forall a b. EffectFn3 (a -> b -> b) b (MutArray a) b
+
 foreign import lengthImpl :: forall a. MutArray a -> Int
+
+foreign import mapImpl :: forall a b. EffectFn2 (a -> b) (MutArray a) (MutArray b)
+
+foreign import lookupImpl :: forall a. EffectFn2 Int (MutArray a) (Nullable a)
+
 
 fromArray :: forall a. Array a -> Effect (MutArray a)
 fromArray = runEffectFn1 fromArrayImpl
@@ -45,5 +54,16 @@ push = runEffectFn2 pushImpl
 foldl :: forall a b. (b -> a -> b) -> b -> MutArray a -> Effect b
 foldl = runEffectFn3 foldlImpl
 
+foldr :: forall a b. (a -> b -> b) -> b -> MutArray a -> Effect b
+foldr = runEffectFn3 foldrImpl
+
 length :: forall a. MutArray a -> Int
 length = lengthImpl
+
+map :: forall a b. (a -> b) -> MutArray a -> Effect (MutArray b)
+map = runEffectFn2 mapImpl
+
+lookup :: forall a. Int -> MutArray a -> Effect (Maybe a)
+lookup n items =  do
+  a <- runEffectFn2 lookupImpl n items
+  pure $ toMaybe a

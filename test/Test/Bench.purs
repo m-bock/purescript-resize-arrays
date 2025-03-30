@@ -10,16 +10,18 @@ import Data.Codec.Argonaut as CA
 import Data.Codec.Argonaut.Common as CACommon
 import Data.Codec.Argonaut.Record as CARecord
 import Data.DateTime.Instant (unInstant)
-import Data.Foldable (all)
+import Data.Foldable (all, foldl, foldr)
 import Data.FoldableWithIndex (foldlWithIndex)
+import Data.FunctorWithIndex (mapWithIndex)
 import Data.Int as Int
+import Data.List (List)
 import Data.List as List
 import Data.List.Lazy (replicateM)
 import Data.List.NonEmpty as NEL
 import Data.List.Types (NonEmptyList)
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Newtype (unwrap, wrap)
 import Data.Number.Format as NumFmt
 import Data.Ord (abs)
@@ -40,7 +42,7 @@ import Effect.Ref as Ref
 import Foreign.Object (Object)
 import Foreign.Object as FO
 import Safe.Coerce (coerce)
-import Test.BenchLib (bench, benchAff, benchGroup_, benchSuite, bench_, run)
+import Test.BenchLib (bench, benchGroup, benchGroup_, benchM, benchSuite, bench_, only, run)
 import Test.BenchLib.Reporters.ChartJsHtml (reportChartJs, reportChartJs_)
 import Test.BenchLib.Reporters.Json (reportJson_)
 import Test.MutArray as MutArray
@@ -49,29 +51,21 @@ main :: Effect Unit
 main = run $
   benchSuite "PureScript collections"
     ( \def -> def
-        { sizes = [ 25_000, 50_000, 100_000 ]
-        , count = 1000
+        { sizes = [ 1, 5_000, 10_000, 20_000 ]
+        , count = 100
         , reporters = def.reporters <>
             [ reportJson_
             , reportChartJs
                 ( \def -> def
-                    { colors = Map.fromFoldable 
-                        [ 
-                        ]
+                    { lineStyles =
+                        mapWithIndex (\ix val -> val { opacity = if ix == 0 then 1.0 else 0.3 }) def.lineStyles
 
                     }
                 )
             ]
         }
     )
-    [ benchGroup_ "simple"
-        [ bench "one" (\def -> def { prepare = \size -> "", finalize = \_ -> 's' })
-            (\(x) -> 1)
-        , bench_ "two"
-            (\_ -> 's')
-        ]
-
-    , benchGroup_ "Delete first item"
+    [ benchGroup_ "Delete first item"
         [ bench "RA.drop"
             ( \def -> def
                 { prepare = RA.fromArray <<< range 1
@@ -95,55 +89,267 @@ main = run $
             )
             (\xs -> List.drop 1 xs)
 
-        , benchAff "MutArray.shift"
+        , benchM "MutArray.shift"
             ( \def -> def
-                { prepare = pure <<< MutArray.fromArray <<< range 1
-                , finalize = pure <<< MutArray.toArray
+                { prepare = MutArray.fromArray <<< range 1
+                , finalize = MutArray.toArray
                 }
             )
-            (\xs -> do
-                -- MutArray.shift xs
-                (MutArray.fromArray []) -- xs
+            ( \xs -> do
+                MutArray.shift xs
+                pure xs
             )
         ]
 
-    
+    , benchGroup_ "Delete last item"
+        [ bench "RA.dropEnd"
+            ( \def -> def
+                { prepare = RA.fromArray <<< range 1
+                , finalize = RA.toArray
+                }
+            )
+            (\xs -> RA.dropEnd 1 xs)
+        , bench "Array.dropEnd"
+            ( \def -> def
+                { prepare = range 1
+                }
+            )
+            (\xs -> Array.dropEnd 1 xs)
+        , bench "List.dropEnd"
+            ( \def -> def
+                { prepare = range 1
+                , finalize = List.toUnfoldable
+                }
+            )
+            (\xs -> List.dropEnd 1 xs)
+        , benchM "MutArray.pop"
+            ( \def -> def
+                { prepare = MutArray.fromArray <<< range 1
+                , finalize = MutArray.toArray
+                }
+            )
+            ( \xs -> do
+                MutArray.pop xs
+                pure xs
+            )
+        ]
 
-    --     -- , bench "MutArray.shift"
-    --     --     ( \def -> def
-    --     --         { count = 1000
-    --     --         , prepare = \n -> MutArray.fromArray [ 8 ]
-    --     --         , finalize = MutArray.toArray
-    --     --         }
-    --     --     )
-    --     --     MutArray.shift
+    , benchGroup_ "Add item to start"
+        [ bench "RA.cons"
+            ( \def -> def
+                { prepare = RA.fromArray <<< range 1
+                , finalize = RA.toArray
+                }
+            )
+            (\xs -> RA.cons 0 xs)
+        , bench "Array.cons"
+            ( \def -> def
+                { prepare = range 1
+                }
+            )
+            (\xs -> Array.cons 0 xs)
+        , bench "List.cons"
+            ( \def -> def
+                { prepare = range 1
+                , finalize = List.toUnfoldable
+                }
+            )
+            (\xs -> List.Cons 0 xs)
+        , benchM "MutArray.unshift"
+            ( \def -> def
+                { prepare = MutArray.fromArray <<< range 1
+                , finalize = MutArray.toArray
+                }
+            )
+            ( \xs -> do
+                MutArray.unshift 0 xs
+                pure xs
+            )
+        ]
 
+    , benchGroup_ "Add item to end"
+        [ bench "RA.snoc"
+            ( \def -> def
+                { prepare = RA.fromArray <<< range 1
+                , finalize = RA.toArray
+                }
+            )
+            (\xs -> RA.snoc xs 0)
+        , bench "Array.snoc"
+            ( \def -> def
+                { prepare = range 1
+                }
+            )
+            (\xs -> Array.snoc xs 0)
+        , bench "List.snoc"
+            ( \def -> def
+                { prepare = range 1
+                , finalize = List.toUnfoldable
+                }
+            )
+            (\xs -> List.snoc xs 0)
+        , benchM "MutArray.push"
+            ( \def -> def
+                { prepare = MutArray.fromArray <<< range 1
+                , finalize = MutArray.toArray
+                }
+            )
+            ( \xs -> do
+                MutArray.push 0 xs
+                pure xs
+            )
+        ]
+
+    , benchGroup_ "map over items"
+        [ bench "map (RA)"
+            ( \def -> def
+                { prepare = RA.fromArray <<< range 1
+                , finalize = RA.toArray
+                }
+            )
+            (\xs -> map (_ + 1) xs)
+        , bench "map (Array)"
+            ( \def -> def
+                { prepare = range 1
+                }
+            )
+            (\xs -> map (_ + 1) xs)
+        , bench "map (List)"
+            ( \def -> def
+                { prepare = range 1
+                , finalize = List.toUnfoldable
+                }
+            )
+            (\xs -> map (_ + 1) xs)
+        , benchM "MutArray.map"
+            ( \def -> def
+                { prepare = MutArray.fromArray <<< range 1
+                , finalize = MutArray.toArray
+                }
+            )
+            ( \xs -> do
+                xs' <- MutArray.map (_ + 1) xs
+                pure xs'
+            )
+        ]
+
+    -- , benchGroup_ "foldl over items"
+    --     [ bench "foldl (RA)"
+    --         ( \def -> def
+    --             { prepare = RA.fromArray <<< range 1
+    --             }
+    --         )
+    --         (\xs -> foldl (+) 0 xs)
+    --     , bench "foldl (Array)"
+    --         ( \def -> def
+    --             { prepare = range 1
+    --             }
+    --         )
+    --         (\xs -> foldl @Array (+) 0 xs)
+    --     , bench "foldl (List)"
+    --         ( \def -> def
+    --             { prepare = range 1
+    --             }
+    --         )
+    --         (\xs -> foldl @List (+) 0 xs)
+    --     , benchM "MutArray.foldl"
+    --         ( \def -> def
+    --             { prepare = MutArray.fromArray <<< range 1
+    --             }
+    --         )
+    --         ( \xs -> do
+    --             xs' <- MutArray.foldl (+) 0 xs
+    --             pure xs'
+    --         )
     --     ]
-    -- , benchGroup "Delete last item" (\def -> def)
-    --     [ bench "RA.dropEnd"
-    --         ( \def -> def
-    --             { prepare = \n -> pure $ RA.fromArray $ range 1 n
-    --             , finalize = pure <<< List.toUnfoldable <<< RA.toList :: _ -> _ (Array _)
-    --             }
-    --         )
-    --         (\(xs) -> RA.dropEnd 1 xs)
 
-    --     , bench "Array.dropEnd"
+    -- , benchGroup_ "foldr over items"
+    --     [ bench "foldr (RA)"
     --         ( \def -> def
-    --             { prepare = \n -> pure $ range 1 n
-    --             , finalize = pure :: _ -> _
+    --             { prepare = RA.fromArray <<< range 1
     --             }
     --         )
-    --         (\xs -> Array.dropEnd 1 xs)
-
-    --     , bench "List.dropEnd"
+    --         (\xs -> foldr (+) 0 xs)
+    --     , bench "foldr (Array)"
     --         ( \def -> def
-    --             { prepare = \n -> pure $ range 1 n
-    --             , finalize = pure <<< List.toUnfoldable :: _ -> _ (Array _)
+    --             { prepare = range 1
     --             }
     --         )
-    --         (\xs -> List.dropEnd 1 xs)
+    --         (\xs -> foldr @Array (+) 0 xs)
+    --     , bench "foldr (List)"
+    --         ( \def -> def
+    --             { prepare = range 1
+    --             }
+    --         )
+    --         (\xs -> foldr @List (+) 0 xs)
+    --     , benchM "MutArray.foldr"
+    --         ( \def -> def
+    --             { prepare = MutArray.fromArray <<< range 1
+    --             }
+    --         )
+    --         ( \xs -> do
+    --             xs' <- MutArray.foldr (+) 0 xs
+    --             pure xs'
+    --         )
     --     ]
+    , benchGroup_ "item lookup"
+        [ bench "RA.index"
+            ( \def -> def
+                { prepare = RA.fromArray <<< range 1
+                }
+            )
+            (\xs -> RA.index xs 0)
+        , bench "Array.index"
+            ( \def -> def
+                { prepare = range 1
+                }
+            )
+            (\xs -> Array.index xs 0)
+        , bench "List.index"
+            ( \def -> def
+                { prepare = range 1
+                }
+            )
+            (\xs -> List.index xs 0)
+        , benchM "MutArray.peek"
+            ( \def -> def
+                { prepare = MutArray.fromArray <<< range 1
+                }
+            )
+            ( \xs -> do
+                xs' <- MutArray.lookup 0 xs
+                pure xs'
+            )
+        ]
+    , benchGroup_ "size"
+        [ bench "RA.length"
+            ( \def -> def
+                { prepare = RA.fromArray <<< range 1
+                }
+            )
+            (\xs -> RA.length xs)
+        , bench "Array.length"
+            ( \def -> def
+                { prepare = range 1
+                }
+            )
+            (\xs -> Array.length xs)
+        , bench "List.length"
+            ( \def -> def
+                { prepare = range 1
+                }
+            )
+            (\xs -> List.length xs)
+        , benchM "MutArray.length"
+            ( \def -> def
+                { prepare = MutArray.fromArray <<< range 1
+                }
+            )
+            ( \xs -> do
+                pure $ MutArray.length xs
+            )
+        ]
+
     ]
 
 main2 :: Effect Unit
@@ -152,122 +358,6 @@ main2 = do
   let ns = [ 25_000, 50_000, 100_000 ]
   benchSuite2 "PureScript collections"
     [
-      -- [ runBench2 "Delete first item" ns \n ->
-      --     let
-      --       arr :: Array Int
-      --       arr = range 1 n
-      --     in
-      --       [ mkBench2 "RA.drop"
-      --           { pre: let xs = RA.fromArray arr in \_ -> pure xs
-      --           , run: \ys -> pure $ RA.drop 1 ys
-      --           , post: pure <<< List.toUnfoldable <<< RA.toList
-      --           }
-      --       , mkBench2 "Array.drop"
-      --           { pre: \_ -> pure arr
-      --           , run: \ys -> pure $ Array.drop 1 ys
-      --           , post: pure
-      --           }
-      --       , mkBench2 "List.drop"
-      --           { pre: let xs = List.fromFoldable arr in \_ -> pure xs
-      --           , run: \ys -> pure $ List.drop 1 ys
-      --           , post: pure <<< List.toUnfoldable
-      --           }
-      --       , mkBench2 "MutAttay.shift"
-      --           { pre: \_ -> MutArray.fromArray arr
-      --           , run: \ys -> do
-      --               MutArray.shift ys
-      --               pure ys
-      --           , post: MutArray.toArray
-      --           }
-      --       ]
-      -- , runBench2 "Delete last item" ns \n ->
-
-      --     let
-      --       arr :: Array Int
-      --       arr = range 1 n
-      --     in
-      --       [ mkBench2 "RA.dropEnd"
-      --           { pre: let xs = RA.fromArray arr in \_ -> pure xs
-      --           , run: \ys -> pure $ RA.dropEnd 1 ys
-      --           , post: pure <<< List.toUnfoldable <<< RA.toList
-      --           }
-      --       , mkBench2 "Array.dropEnd"
-      --           { pre: \_ -> pure arr
-      --           , run: \ys -> pure $ Array.dropEnd 1 ys
-      --           , post: pure
-      --           }
-      --       , mkBench2 "List.dropEnd"
-      --           { pre: let xs = List.fromFoldable arr in \_ -> pure xs
-      --           , run: \ys -> pure $ List.dropEnd 1 ys
-      --           , post: pure <<< List.toUnfoldable
-      --           }
-      --       , mkBench2 "MutArray.pop"
-      --           { pre: \_ -> MutArray.fromArray arr
-      --           , run: \ys -> do
-      --               MutArray.pop ys
-      --               pure ys
-      --           , post: MutArray.toArray
-      --           }
-      --       ]
-      runBench2 "Add item to start"
-        ns
-        \n ->
-          let
-            arr :: Array Int
-            arr = range 1 n
-          in
-            [ mkBench2 "RA.cons"
-                { pre: let xs = RA.fromArray arr in \_ -> pure xs
-                , run: \ys -> pure $ RA.cons 0 ys
-                , post: pure <<< List.toUnfoldable <<< RA.toList
-                }
-            , mkBench2 "Array.cons"
-                { pre: \_ -> pure arr
-                , run: \ys -> pure $ Array.cons 0 ys
-                , post: pure
-                }
-            , mkBench2 "List.cons"
-                { pre: let xs = List.fromFoldable arr in \_ -> pure xs
-                , run: \ys -> pure $ List.Cons 0 ys
-                , post: pure <<< List.toUnfoldable
-                }
-            , mkBench2 "MutArray.unshift"
-                { pre: \_ -> MutArray.fromArray arr
-                , run: \ys -> do
-                    MutArray.unshift 0 ys
-                    pure ys
-                , post: MutArray.toArray
-                }
-            ]
-    , runBench2 "Add item to end" ns \n ->
-        let
-          arr :: Array Int
-          arr = range 1 n
-        in
-          [ mkBench2 "RA.snoc"
-              { pre: let xs = RA.fromArray arr in \_ -> pure xs
-              , run: \ys -> pure $ RA.snoc ys 0
-              , post: pure <<< List.toUnfoldable <<< RA.toList
-              }
-          , mkBench2 "Array.snoc"
-              { pre: \_ -> pure arr
-              , run: \ys -> pure $ Array.snoc ys 0
-              , post: pure
-              }
-          , mkBench2 "List.snoc"
-              { pre: let xs = List.fromFoldable arr in \_ -> pure xs
-              , run: \ys -> pure $ List.snoc ys 0
-              , post: pure <<< List.toUnfoldable
-              }
-          , mkBench2 "MutArray.push"
-              { pre: \_ -> MutArray.fromArray arr
-              , run: \ys -> do
-                  MutArray.push 0 ys
-                  pure ys
-              , post: MutArray.toArray
-              }
-          ]
-
     -- , runBench2 "Delete last item" ns \n ->
     --     let
     --       arr :: Array Char

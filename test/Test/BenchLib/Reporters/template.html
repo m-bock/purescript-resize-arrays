@@ -28,10 +28,12 @@
     <script>
       /* config start */
       const config = {
-        colors: {
-          "Array.cons": "#FF8C66",
-          "List.cons": "#66A3FF",
-        },
+        lineStyles: [
+          { color: { r: 255, g: 99, b: 132 }, width: 2, opacity: 0.5 },
+          { color: { r: 54, g: 162, b: 235 }, width: 2, opacity: 0.5 },
+          { color: { r: 255, g: 206, b: 86 }, width: 2, opacity: 0.5 },
+        ],
+        transparencies: [0.5],
         data: {
           suiteName: "Sample Bench Suite",
           groups: [
@@ -53,7 +55,6 @@
                   size: 3,
                   duration: 0.3,
                 },
-
                 {
                   benchName: "List.cons",
                   size: 1,
@@ -141,12 +142,18 @@
           const labels = [...new Set(group.benchs.map((bench) => bench.size))];
 
           const datasets = Object.values(
-            group.benchs.reduce((acc, bench) => {
+            group.benchs.reduce((acc, bench, index) => {
               if (!acc[bench.benchName]) {
+                const style =
+                  config.lineStyles[index % config.lineStyles.length];
+                const rgbaColor = `rgba(${style.color.r}, ${style.color.g}, ${style.color.b}, ${style.opacity})`;
+
                 acc[bench.benchName] = {
                   label: bench.benchName,
                   data: [],
-                  borderColor: config.colors[bench.benchName] || "#000",
+                  borderColor: rgbaColor,
+                  borderWidth: style.width,
+                  backgroundColor: rgbaColor,
                   fill: false,
                   tension: 0.1,
                 };
@@ -171,6 +178,7 @@
               },
               scales: {
                 x: {
+                  type: "linear",
                   title: {
                     display: true,
                     text: "Input Size",
@@ -179,6 +187,7 @@
                 y: {
                   title: {
                     display: true,
+
                     text: "Time (milliseconds)",
                   },
                 },
