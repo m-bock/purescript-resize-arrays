@@ -7,5 +7,13 @@ The `resize-arrays` library provides an array-like data structure that supports 
 
 Folding and mapping operations in this library tend to be slower than those in List or Array. However, their time complexity remains O(n).
 
+## Documentation
+
 - [CPU Benchmarks](https://m-bock.github.io/purescript-resize-arrays/benchmarks.html)
 - [API Docs](https://pursuit.purescript.org/packages/purescript-resize-arrays)
+
+## Installation
+
+```bash
+spago install resize-arrays
+```
