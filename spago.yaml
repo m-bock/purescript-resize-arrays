@@ -3,6 +3,11 @@ package:
   dependencies:
     - prelude
     - unordered-collections
+    - foldable-traversable
+    - lists
+    - maybe
+    - tailrec
+    - tuples
 
   test:
     main: Test.Main
