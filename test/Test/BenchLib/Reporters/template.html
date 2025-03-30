@@ -185,10 +185,16 @@
                   },
                 },
                 y: {
+                  max: (ctx) => {
+                    const maxValue = Math.max(
+                      ...ctx.chart.data.datasets.flatMap((ds) => ds.data)
+                    );
+                    return Math.max(maxValue, 10);
+                  },
                   title: {
                     display: true,
 
-                    text: "Average Time (milliseconds)",
+                    text: "Average Time (ms)",
                   },
                 },
               },

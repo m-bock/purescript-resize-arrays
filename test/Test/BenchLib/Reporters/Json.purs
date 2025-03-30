@@ -1,11 +1,16 @@
-module Test.BenchLib.Reporters.Json where
+module Test.BenchLib.Reporters.Json
+  ( Opts
+  , codecSuiteResults
+  , reportJson
+  , reportJson_
+  )
+  where
 
 import Prelude
 
 import Data.Argonaut (stringifyWithIndent)
 import Data.Codec.Argonaut (JsonCodec)
 import Data.Codec.Argonaut as CA
-import Data.Codec.Argonaut.Common as CACommon
 import Data.Codec.Argonaut.Record as CAR
 import Data.Newtype (unwrap, wrap)
 import Data.Profunctor (dimap)
@@ -45,7 +50,7 @@ toJsonStr = stringifyWithIndent 2 <<< CA.encode codecSuiteResults
 codecSuiteResults :: JsonCodec SuiteResults
 codecSuiteResults = CAR.object "SuiteResults"
   { suiteName: CA.string
-  , groups: CACommon.array codecGroupResults
+  , groups: CA.array codecGroupResults
   }
 
 codecGroupResults :: JsonCodec GroupResults

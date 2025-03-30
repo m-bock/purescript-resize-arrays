@@ -32,11 +32,9 @@ import Data.List.Types (NonEmptyList)
 import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import Data.Newtype (unwrap)
-import Data.String as Str
 import Data.Time.Duration (Milliseconds(..))
 import Data.Traversable (for, for_, sum)
 import Data.Tuple.Nested (type (/\), (/\))
-import Data.Unfoldable (replicate)
 import Data.Unfoldable1 (replicate1A)
 import Effect (Effect)
 import Effect.Aff (Aff, error, launchAff_)
@@ -70,7 +68,7 @@ type GroupOpts =
   , reporters :: Array Reporter
   }
 
-type BenchOptsAff (m :: Type -> Type) input result output =
+type BenchOptsM (m :: Type -> Type) input result output =
   { iterations :: Int
   , prepare :: Size -> m input
   , finalize :: result -> m output
@@ -229,7 +227,6 @@ benchGroup groupName mkOpts benches_ = notOnly
                   pure ({ benchName, duration, iterations } /\ output)
               )
 
-
             checkResults groupOpts (map (\({ benchName } /\ output) -> { benchName, output }) resultsPerBench)
 
             runReporters groupOpts.reporters \rep -> rep.onSizeFinish size
@@ -253,7 +250,7 @@ instance MonadBench Effect where
 instance MonadBench Aff where
   toAff = identity
 
-benchImpl :: forall m a b c. Eq c => MonadBench m => String -> (BenchOptsPure Unit c c -> BenchOptsAff m a b c) -> (a -> m b) -> Bench c
+benchImpl :: forall m a b c. Eq c => MonadBench m => String -> (BenchOptsPure Unit c c -> BenchOptsM m a b c) -> (a -> m b) -> Bench c
 benchImpl benchName mkOpts benchFn = notOnly
   { benchName
   , run: \defOpts size -> do
@@ -291,7 +288,7 @@ benchImpl benchName mkOpts benchFn = notOnly
       pure (benchResult /\ output)
   }
 
-benchOptsPureToAff :: forall @m a b c. Applicative m => BenchOptsPure a b c -> BenchOptsAff m a b c
+benchOptsPureToAff :: forall @m a b c. Applicative m => BenchOptsPure a b c -> BenchOptsM m a b c
 benchOptsPureToAff { iterations, prepare, finalize, reporters } =
   { iterations
   , prepare: \size -> pure $ prepare size
@@ -305,7 +302,7 @@ bench name mkOpts benchFn = benchImpl name (benchOptsPureToAff @Effect <<< mkOpt
 bench_ :: forall c. Eq c => String -> (Unit -> c) -> Bench c
 bench_ name benchFn = bench name identity benchFn
 
-benchM :: forall m a b c. MonadBench m => Eq c => String -> (BenchOptsAff m Unit c c -> BenchOptsAff m a b c) -> (a -> m b) -> Bench c
+benchM :: forall m a b c. MonadBench m => Eq c => String -> (BenchOptsM m Unit c c -> BenchOptsM m a b c) -> (a -> m b) -> Bench c
 benchM name mkOpts benchFn = benchImpl name (mkOpts <<< benchOptsPureToAff) benchFn
 
 benchM_ :: forall m c. Eq c => MonadBench m => String -> (Unit -> m c) -> Bench c
@@ -333,9 +330,6 @@ checkResults groupOpts results_ =
     throwError (error "Benchmarks results are not equal")
   where
   results = map (\({ benchName, output }) -> { benchName, output: show output }) results_
-
-pad :: Int -> String -> String
-pad n str = Str.joinWith "" (replicate (n - Str.length str) ".") <> str
 
 only :: forall a. MayOnly a -> MayOnly a
 only { val } = { val, only: true }

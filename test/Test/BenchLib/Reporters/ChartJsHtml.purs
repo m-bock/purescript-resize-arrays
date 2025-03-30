@@ -1,25 +1,25 @@
-module Test.BenchLib.Reporters.ChartJsHtml where
+module Test.BenchLib.Reporters.ChartJsHtml
+  ( Color
+  , LineStyle
+  , Opts
+  , reportChartJs
+  , reportChartJs_
+  ) where
 
 import Prelude
 
-import Data.Argonaut (Json)
 import Data.Argonaut as Json
 import Data.Codec.Argonaut (JsonCodec)
 import Data.Codec.Argonaut as CA
-import Data.Codec.Argonaut as Ca
 import Data.Codec.Argonaut.Record as CAR
-import Data.Either (Either)
-import Data.Map (Map)
-import Data.Map as Map
 import Data.String (Pattern(..))
 import Data.String as Str
 import Data.String.Regex as Regex
 import Data.String.Regex.Flags (noFlags)
 import Data.String.Regex.Unsafe (unsafeRegex)
-import Data.Traversable (foldl, for)
+import Data.Traversable (foldl)
 import Effect (Effect)
 import Effect.Class.Console as Console
-import Foreign.Object as Obj
 import Node.Encoding (Encoding(..))
 import Node.FS.Sync as FS
 import Test.BenchLib (Reporter, SuiteResults, defaultReporter)
@@ -42,20 +42,6 @@ type Color =
   , b :: Int
   }
 
-codecMapAsObj :: forall v. JsonCodec v -> JsonCodec (Map String v)
-codecMapAsObj c = CA.codec dec enc
-  where
-  dec :: Json -> Either _ (Map String v)
-  dec json = do
-    objJson <- CA.decode Ca.jobject json
-    obj <- for objJson \k ->
-      CA.decode c k
-    pure (Map.fromFoldableWithIndex obj)
-
-  enc :: Map String v -> Json
-  enc mp =
-    CA.encode Ca.jobject $ Obj.fromFoldableWithIndex $ map (CA.encode c) mp
-
 defaultOpts :: Opts
 defaultOpts =
   { lineStyles:
@@ -73,8 +59,8 @@ defaultOpts =
   , filePath: "bench-results.html"
   }
   where
-    opacity = 0.5
-    width = 2.0
+  opacity = 0.5
+  width = 2.0
 
 writeHtml :: Opts -> SuiteResults -> Effect Unit
 writeHtml opts suiteResults = do
@@ -100,8 +86,6 @@ writeHtml opts suiteResults = do
 
   let out = foldl (\acc { regex, replacement } -> Regex.replace regex replacement acc) template replacements
   FS.writeTextFile UTF8 opts.filePath out
-
-
 
 reportChartJs :: (Opts -> Opts) -> Reporter
 reportChartJs mkOpts =
