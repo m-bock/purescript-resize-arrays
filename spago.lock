@@ -5,7 +5,12 @@
         "path": "./",
         "core": {
           "dependencies": [
+            "foldable-traversable",
+            "lists",
+            "maybe",
             "prelude",
+            "tailrec",
+            "tuples",
             "unordered-collections"
           ],
           "build_plan": [
