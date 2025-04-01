@@ -1,6 +1,7 @@
 package:
   name: resize-arrays
   dependencies:
+    - benchlib
     - foldable-traversable: ">=6.0.0 <7.0.0"
     - lists: ">=7.0.0 <8.0.0"
     - maybe: ">=6.0.0 <7.0.0"
@@ -15,10 +16,7 @@ package:
       - console
       - effect
       - spec
-      - nullable
-      - node-fs
-      - codec-argonaut
-      - argonaut
+      - benchlib
 
   publish:
     version: 0.0.1
@@ -29,5 +27,5 @@ package:
 
 workspace:
   packageSet:
-    registry: 63.5.0
+    registry: 63.9.0
   extraPackages: {}

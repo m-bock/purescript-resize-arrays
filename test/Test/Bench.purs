@@ -10,16 +10,16 @@ import Data.List as List
 import Data.ResizeArray as ResizeArray
 import Data.Unfoldable (range)
 import Effect (Effect)
-import Test.BenchLib (bench, benchGroup_, benchM, benchSuite)
-import Test.BenchLib as BenchLib
-import Test.BenchLib.Reporters.ChartJsHtml (reportChartJs)
+import BenchLib (bench, benchGroup_, benchM, benchSuite)
+import BenchLib as BenchLib
+import BenchLib.Reporters.Html (reportHtml)
 import Test.MutArray as MutArray
 
 main :: Effect Unit
 main = BenchLib.run $
   let
     reporters =
-      [ reportChartJs
+      [ reportHtml
           ( \def -> def
               { filePath = "docs/benchmarks.html"
               , lineStyles =
