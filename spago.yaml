@@ -1,7 +1,6 @@
 package:
   name: resize-arrays
   dependencies:
-    - benchlib
     - foldable-traversable: ">=6.0.0 <7.0.0"
     - lists: ">=7.0.0 <8.0.0"
     - maybe: ">=6.0.0 <7.0.0"
@@ -27,5 +26,18 @@ package:
 
 workspace:
   packageSet:
-    registry: 63.9.0
-  extraPackages: {}
+    registry: 64.1.1
+  extraPackages:
+    benchlib:
+      git: "https://github.com/m-bock/purescript-benchlib.git"
+      ref: "4d45326ea5400aec5eeb287b506689b3d61cbe65"
+    codec-argonaut:
+      git: "https://github.com/garyb/purescript-codec-argonaut.git"
+      ref: "78b0171958a4f21ed23946fe7e574ea5018902d9"
+      dependencies:
+        - argonaut-core
+        - codec
+        - variant
+        - ordered-collections
+        - type-equality
+        - foreign-object

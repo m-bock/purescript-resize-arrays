@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PureScript collections CPU Benchmarks</title>
+    <title>PureScript collections Benchmarks</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
       body {
@@ -29,1350 +30,990 @@
       /* config start */
       const config = {
         "data": {
-          "groups": [
+          "groupResults": [
             {
-              "benchs": [
+              "benchResults": [
                 {
                   "benchName": "ResizeArray.drop",
-                  "duration": 0.004,
-                  "iterations": 1000,
-                  "size": 0
+                  "samples": [
+                    {
+                      "average": 0.02,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0.01,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
                   "benchName": "Array.drop",
-                  "duration": 0.002,
-                  "iterations": 1000,
-                  "size": 0
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0.01,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0.01,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0.09,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
                   "benchName": "List.drop",
-                  "duration": 0.003,
-                  "iterations": 1000,
-                  "size": 0
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
                   "benchName": "MutArray.shift",
-                  "duration": 0.002,
-                  "iterations": 1000,
-                  "size": 0
-                },
-                {
-                  "benchName": "ResizeArray.drop",
-                  "duration": 0.003,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "Array.drop",
-                  "duration": 0.111,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "List.drop",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "MutArray.shift",
-                  "duration": 0.003,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "ResizeArray.drop",
-                  "duration": 0.003,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "Array.drop",
-                  "duration": 0.194,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "List.drop",
-                  "duration": 0.003,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "MutArray.shift",
-                  "duration": 0.009,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "ResizeArray.drop",
-                  "duration": 0.002,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "Array.drop",
-                  "duration": 0.299,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "List.drop",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "MutArray.shift",
-                  "duration": 0.016,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "ResizeArray.drop",
-                  "duration": 0.002,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "Array.drop",
-                  "duration": 0.356,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "List.drop",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "MutArray.shift",
-                  "duration": 0.012,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "ResizeArray.drop",
-                  "duration": 0.005,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "Array.drop",
-                  "duration": 0.454,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "List.drop",
-                  "duration": 0.002,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "MutArray.shift",
-                  "duration": 0.026,
-                  "iterations": 1000,
-                  "size": 100000
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 }
               ],
+              "checkResult": {
+                "tag": "CheckedSuccess",
+                "values": []
+              },
               "groupName": "Delete first item"
             },
             {
-              "benchs": [
+              "benchResults": [
                 {
                   "benchName": "ResizeArray.dropEnd",
-                  "duration": 0.002,
-                  "iterations": 1000,
-                  "size": 0
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0.02,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0.02,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0.01,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
                   "benchName": "Array.dropEnd",
-                  "duration": 0.002,
-                  "iterations": 1000,
-                  "size": 0
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0.01,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0.09,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
                   "benchName": "List.dropEnd",
-                  "duration": 0.003,
-                  "iterations": 1000,
-                  "size": 0
+                  "samples": [
+                    {
+                      "average": 0.02,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0.38,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0.58,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 1.39,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
                   "benchName": "MutArray.pop",
-                  "duration": 0.002,
-                  "iterations": 1000,
-                  "size": 0
-                },
-                {
-                  "benchName": "ResizeArray.dropEnd",
-                  "duration": 0.014,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "Array.dropEnd",
-                  "duration": 0.105,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "List.dropEnd",
-                  "duration": 1.37,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "MutArray.pop",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "ResizeArray.dropEnd",
-                  "duration": 0.086,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "Array.dropEnd",
-                  "duration": 0.191,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "List.dropEnd",
-                  "duration": 1.52,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "MutArray.pop",
-                  "duration": 0.003,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "ResizeArray.dropEnd",
-                  "duration": 0.429,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "Array.dropEnd",
-                  "duration": 0.274,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "List.dropEnd",
-                  "duration": 2.454,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "MutArray.pop",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "ResizeArray.dropEnd",
-                  "duration": 0.386,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "Array.dropEnd",
-                  "duration": 0.363,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "List.dropEnd",
-                  "duration": 3.938,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "MutArray.pop",
-                  "duration": 0.002,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "ResizeArray.dropEnd",
-                  "duration": 0.356,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "Array.dropEnd",
-                  "duration": 0.442,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "List.dropEnd",
-                  "duration": 9.637,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "MutArray.pop",
-                  "duration": 0.003,
-                  "iterations": 1000,
-                  "size": 100000
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 }
               ],
+              "checkResult": {
+                "tag": "CheckedSuccess",
+                "values": []
+              },
               "groupName": "Delete last item"
             },
             {
-              "benchs": [
+              "benchResults": [
                 {
                   "benchName": "ResizeArray.cons",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 0
+                  "samples": [
+                    {
+                      "average": 0.01,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0.01,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
                   "benchName": "Array.cons",
-                  "duration": 0.003,
-                  "iterations": 1000,
-                  "size": 0
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0.01,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0.09,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
                   "benchName": "List.cons",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 0
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
                   "benchName": "MutArray.unshift",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 0
-                },
-                {
-                  "benchName": "ResizeArray.cons",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "Array.cons",
-                  "duration": 0.111,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "List.cons",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "MutArray.unshift",
-                  "duration": 0.158,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "ResizeArray.cons",
-                  "duration": 0.002,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "Array.cons",
-                  "duration": 0.196,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "List.cons",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "MutArray.unshift",
-                  "duration": 0.269,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "ResizeArray.cons",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "Array.cons",
-                  "duration": 0.287,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "List.cons",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "MutArray.unshift",
-                  "duration": 0.408,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "ResizeArray.cons",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "Array.cons",
-                  "duration": 0.376,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "List.cons",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "MutArray.unshift",
-                  "duration": 0.596,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "ResizeArray.cons",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "Array.cons",
-                  "duration": 0.463,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "List.cons",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "MutArray.unshift",
-                  "duration": 0.61,
-                  "iterations": 1000,
-                  "size": 100000
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 }
               ],
+              "checkResult": {
+                "tag": "CheckedSuccess",
+                "values": []
+              },
               "groupName": "Add item to start"
             },
             {
-              "benchs": [
+              "benchResults": [
                 {
                   "benchName": "ResizeArray.snoc",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 0
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0.01,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0.01,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0.01,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
                   "benchName": "Array.snoc",
-                  "duration": 0.003,
-                  "iterations": 1000,
-                  "size": 0
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0.01,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0.02,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0.26,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
                   "benchName": "List.snoc",
-                  "duration": 0.002,
-                  "iterations": 1000,
-                  "size": 0
+                  "samples": [
+                    {
+                      "average": 0.01,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0.41,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0.84,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 1.75,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
                   "benchName": "MutArray.push",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 0
-                },
-                {
-                  "benchName": "ResizeArray.snoc",
-                  "duration": 0.009,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "Array.snoc",
-                  "duration": 0.252,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "List.snoc",
-                  "duration": 1.681,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "MutArray.push",
-                  "duration": 0.131,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "ResizeArray.snoc",
-                  "duration": 0.089,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "Array.snoc",
-                  "duration": 0.465,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "List.snoc",
-                  "duration": 4.63,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "MutArray.push",
-                  "duration": 0.277,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "ResizeArray.snoc",
-                  "duration": 0.309,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "Array.snoc",
-                  "duration": 0.698,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "List.snoc",
-                  "duration": 8.706,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "MutArray.push",
-                  "duration": 0.398,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "ResizeArray.snoc",
-                  "duration": 0.377,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "Array.snoc",
-                  "duration": 0.945,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "List.snoc",
-                  "duration": 13.782,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "MutArray.push",
-                  "duration": 0.647,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "ResizeArray.snoc",
-                  "duration": 0.458,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "Array.snoc",
-                  "duration": 1.116,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "List.snoc",
-                  "duration": 19.531,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "MutArray.push",
-                  "duration": 0.639,
-                  "iterations": 1000,
-                  "size": 100000
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 }
               ],
+              "checkResult": {
+                "tag": "CheckedSuccess",
+                "values": []
+              },
               "groupName": "Add item to end"
             },
             {
-              "benchs": [
+              "benchResults": [
                 {
-                  "benchName": "map (ResizeArray)",
-                  "duration": 0.002,
-                  "iterations": 1000,
-                  "size": 0
+                  "benchName": "ResizeArray.map",
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0.11,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0.14,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0.23,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
-                  "benchName": "map (Array)",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 0
+                  "benchName": "Array.map",
+                  "samples": [
+                    {
+                      "average": 0.01,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0.05,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0.08,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0.24,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
-                  "benchName": "map (List)",
-                  "duration": 0.002,
-                  "iterations": 1000,
-                  "size": 0
-                },
-                {
-                  "benchName": "MutArray.map",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 0
-                },
-                {
-                  "benchName": "map (ResizeArray)",
-                  "duration": 0.222,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "map (Array)",
-                  "duration": 0.258,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "map (List)",
-                  "duration": 0.347,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "MutArray.map",
-                  "duration": 0.202,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "map (ResizeArray)",
-                  "duration": 0.713,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "map (Array)",
-                  "duration": 0.475,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "map (List)",
-                  "duration": 0.865,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "MutArray.map",
-                  "duration": 0.541,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "map (ResizeArray)",
-                  "duration": 1.551,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "map (Array)",
-                  "duration": 0.744,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "map (List)",
-                  "duration": 1.078,
-                  "iterations": 1000,
-                  "size": 60000
+                  "benchName": "List.map",
+                  "samples": [
+                    {
+                      "average": 0.01,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0.2,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0.3,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0.33,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
                   "benchName": "MutArray.map",
-                  "duration": 1.079,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "map (ResizeArray)",
-                  "duration": 2.245,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "map (Array)",
-                  "duration": 0.936,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "map (List)",
-                  "duration": 2.628,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "MutArray.map",
-                  "duration": 1.718,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "map (ResizeArray)",
-                  "duration": 2.396,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "map (Array)",
-                  "duration": 1.18,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "map (List)",
-                  "duration": 1.922,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "MutArray.map",
-                  "duration": 1.788,
-                  "iterations": 1000,
-                  "size": 100000
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 }
               ],
+              "checkResult": {
+                "tag": "CheckedSuccess",
+                "values": []
+              },
               "groupName": "map over items"
             },
             {
-              "benchs": [
+              "benchResults": [
                 {
-                  "benchName": "foldl (ResizeArray)",
-                  "duration": 0.009,
-                  "iterations": 1000,
-                  "size": 0
+                  "benchName": "ResizeArray.foldl",
+                  "samples": [
+                    {
+                      "average": 0.01,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0.77,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 1.38,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 2.76,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
-                  "benchName": "foldl (Array)",
-                  "duration": 0.002,
-                  "iterations": 1000,
-                  "size": 0
+                  "benchName": "Array.foldl",
+                  "samples": [
+                    {
+                      "average": 0.01,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0.12,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0.23,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0.45,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
-                  "benchName": "foldl (List)",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 0
-                },
-                {
-                  "benchName": "MutArray.foldl",
-                  "duration": 0.002,
-                  "iterations": 1000,
-                  "size": 0
-                },
-                {
-                  "benchName": "foldl (ResizeArray)",
-                  "duration": 3.017,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "foldl (Array)",
-                  "duration": 0.424,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "foldl (List)",
-                  "duration": 0.55,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "MutArray.foldl",
-                  "duration": 0.019,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "foldl (ResizeArray)",
-                  "duration": 6.817,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "foldl (Array)",
-                  "duration": 0.827,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "foldl (List)",
-                  "duration": 1.229,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "MutArray.foldl",
-                  "duration": 0.032,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "foldl (ResizeArray)",
-                  "duration": 14.744,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "foldl (Array)",
-                  "duration": 1.285,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "foldl (List)",
-                  "duration": 1.799,
-                  "iterations": 1000,
-                  "size": 60000
+                  "benchName": "List.foldl",
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0.16,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0.37,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0.64,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
                   "benchName": "MutArray.foldl",
-                  "duration": 0.043,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "foldl (ResizeArray)",
-                  "duration": 20.922,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "foldl (Array)",
-                  "duration": 1.764,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "foldl (List)",
-                  "duration": 2.705,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "MutArray.foldl",
-                  "duration": 0.421,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "foldl (ResizeArray)",
-                  "duration": 28.223,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "foldl (Array)",
-                  "duration": 2.433,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "foldl (List)",
-                  "duration": 3.493,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "MutArray.foldl",
-                  "duration": 0.286,
-                  "iterations": 1000,
-                  "size": 100000
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 }
               ],
+              "checkResult": {
+                "tag": "CheckedSuccess",
+                "values": []
+              },
               "groupName": "foldl over items"
             },
             {
-              "benchs": [
+              "benchResults": [
                 {
-                  "benchName": "foldr (ResizeArray)",
-                  "duration": 0.002,
-                  "iterations": 1000,
-                  "size": 0
+                  "benchName": "ResizeArray.foldr",
+                  "samples": [
+                    {
+                      "average": 0.01,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0.84,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 1.29,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 2.7,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
-                  "benchName": "foldr (Array)",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 0
+                  "benchName": "Array.foldr",
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0.11,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0.23,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0.45,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
-                  "benchName": "foldr (List)",
-                  "duration": 0.002,
-                  "iterations": 1000,
-                  "size": 0
-                },
-                {
-                  "benchName": "MutArray.foldr",
-                  "duration": 0.002,
-                  "iterations": 1000,
-                  "size": 0
-                },
-                {
-                  "benchName": "foldr (ResizeArray)",
-                  "duration": 2.923,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "foldr (Array)",
-                  "duration": 0.605,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "foldr (List)",
-                  "duration": 1.727,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "MutArray.foldr",
-                  "duration": 0.106,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "foldr (ResizeArray)",
-                  "duration": 6.786,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "foldr (Array)",
-                  "duration": 0.948,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "foldr (List)",
-                  "duration": 3.793,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "MutArray.foldr",
-                  "duration": 0.227,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "foldr (ResizeArray)",
-                  "duration": 14.079,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "foldr (Array)",
-                  "duration": 1.467,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "foldr (List)",
-                  "duration": 5.764,
-                  "iterations": 1000,
-                  "size": 60000
+                  "benchName": "List.foldr",
+                  "samples": [
+                    {
+                      "average": 0.01,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0.36,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0.7,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 1.46,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
                   "benchName": "MutArray.foldr",
-                  "duration": 0.299,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "foldr (ResizeArray)",
-                  "duration": 18.759,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "foldr (Array)",
-                  "duration": 2.218,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "foldr (List)",
-                  "duration": 9.985,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "MutArray.foldr",
-                  "duration": 0.4,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "foldr (ResizeArray)",
-                  "duration": 26.734,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "foldr (Array)",
-                  "duration": 2.438,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "foldr (List)",
-                  "duration": 14.305,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "MutArray.foldr",
-                  "duration": 0.512,
-                  "iterations": 1000,
-                  "size": 100000
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 }
               ],
+              "checkResult": {
+                "tag": "CheckedSuccess",
+                "values": []
+              },
               "groupName": "foldr over items"
             },
             {
-              "benchs": [
+              "benchResults": [
                 {
                   "benchName": "ResizeArray.index",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 0
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
                   "benchName": "Array.index",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 0
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
                   "benchName": "List.index",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 0
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0.06,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0.07,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0.16,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
                   "benchName": "MutArray.lookup",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 0
-                },
-                {
-                  "benchName": "ResizeArray.index",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "Array.index",
-                  "duration": 0.002,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "List.index",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "MutArray.lookup",
-                  "duration": 0.003,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "ResizeArray.index",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "Array.index",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "List.index",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "MutArray.lookup",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "ResizeArray.index",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "Array.index",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "List.index",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "MutArray.lookup",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "ResizeArray.index",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "Array.index",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "List.index",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "MutArray.lookup",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "ResizeArray.index",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "Array.index",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "List.index",
-                  "duration": 0.006,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "MutArray.lookup",
-                  "duration": 0.003,
-                  "iterations": 1000,
-                  "size": 100000
+                  "samples": [
+                    {
+                      "average": 0.01,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 }
               ],
+              "checkResult": {
+                "tag": "CheckedSuccess",
+                "values": []
+              },
               "groupName": "item lookup"
             },
             {
-              "benchs": [
+              "benchResults": [
                 {
                   "benchName": "ResizeArray.length",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 0
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0.01,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0.01,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0.01,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
                   "benchName": "Array.length",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 0
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
                   "benchName": "List.length",
-                  "duration": 0.002,
-                  "iterations": 1000,
-                  "size": 0
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0.17,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0.33,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0.64,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 },
                 {
                   "benchName": "MutArray.length",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 0
-                },
-                {
-                  "benchName": "ResizeArray.length",
-                  "duration": 0.011,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "Array.length",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "List.length",
-                  "duration": 0.626,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "MutArray.length",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 20000
-                },
-                {
-                  "benchName": "ResizeArray.length",
-                  "duration": 0.142,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "Array.length",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "List.length",
-                  "duration": 1.414,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "MutArray.length",
-                  "duration": 0.002,
-                  "iterations": 1000,
-                  "size": 40000
-                },
-                {
-                  "benchName": "ResizeArray.length",
-                  "duration": 0.294,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "Array.length",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "List.length",
-                  "duration": 1.863,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "MutArray.length",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 60000
-                },
-                {
-                  "benchName": "ResizeArray.length",
-                  "duration": 0.373,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "Array.length",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "List.length",
-                  "duration": 1.104,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "MutArray.length",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 80000
-                },
-                {
-                  "benchName": "ResizeArray.length",
-                  "duration": 0.403,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "Array.length",
-                  "duration": 0.001,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "List.length",
-                  "duration": 1.045,
-                  "iterations": 1000,
-                  "size": 100000
-                },
-                {
-                  "benchName": "MutArray.length",
-                  "duration": 0,
-                  "iterations": 1000,
-                  "size": 100000
+                  "samples": [
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 0
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 5000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 10000
+                    },
+                    {
+                      "average": 0,
+                      "iterations": 100,
+                      "size": 20000
+                    }
+                  ]
                 }
               ],
+              "checkResult": {
+                "tag": "CheckedSuccess",
+                "values": []
+              },
               "groupName": "size"
             }
           ],
-          "suiteName": "PureScript collections CPU Benchmarks"
+          "suiteName": "PureScript collections Benchmarks"
         },
         "lineStyles": [
           {
@@ -1465,7 +1106,8 @@
             "opacity": 0.3,
             "width": 2
           }
-        ]
+        ],
+        "minSpeed": 5
       }
       /* config end */
 
@@ -1481,7 +1123,7 @@
 
         document.body.appendChild(container);
 
-        dataConfig.groups.forEach((group, groupIndex) => {
+        dataConfig.groupResults.forEach((group, groupIndex) => {
           const chartContainer = document.createElement("div");
           chartContainer.style.marginBottom = "40px";
 
@@ -1495,29 +1137,31 @@
 
           container.appendChild(chartContainer);
 
-          const labels = [...new Set(group.benchs.map((bench) => bench.size))];
+          const labels = [
+            ...new Set(
+              group.benchResults.flatMap((bench) =>
+                bench.samples.map((sample) => sample.size)
+              )
+            ),
+          ];
 
-          const datasets = Object.values(
-            group.benchs.reduce((acc, bench, index) => {
-              if (!acc[bench.benchName]) {
-                const style =
-                  config.lineStyles[index % config.lineStyles.length];
-                const rgbaColor = `rgba(${style.color.r}, ${style.color.g}, ${style.color.b}, ${style.opacity})`;
+          const datasets = group.benchResults.map((bench, index) => {
+            const style = config.lineStyles[index % config.lineStyles.length];
+            const rgbaColor = `rgba(${style.color.r}, ${style.color.g}, ${style.color.b}, ${style.opacity})`;
 
-                acc[bench.benchName] = {
-                  label: bench.benchName,
-                  data: [],
-                  borderColor: rgbaColor,
-                  borderWidth: style.width,
-                  backgroundColor: rgbaColor,
-                  fill: false,
-                  tension: 0.1,
-                };
-              }
-              acc[bench.benchName].data.push(bench.duration);
-              return acc;
-            }, {})
-          );
+            return {
+              label: bench.benchName,
+              data: bench.samples.map((sample) => ({
+                x: sample.size,
+                y: sample.average,
+              })),
+              borderColor: rgbaColor,
+              borderWidth: style.width,
+              backgroundColor: rgbaColor,
+              fill: false,
+              tension: 0.1,
+            };
+          });
 
           new Chart(canvas.getContext("2d"), {
             type: "line",
@@ -1543,10 +1187,12 @@
                 y: {
                   max: (ctx) => {
                     const maxValue = Math.max(
-                      ...ctx.chart.data.datasets.flatMap((ds) => ds.data)
+                      ...ctx.chart.data.datasets.flatMap((ds) => ds.data.map((d) => d.y))
                     );
-                    return Math.max(maxValue, 10);
+                    console.log(ctx.chart.data.datasets);
+                    return Math.max(maxValue, config.minSpeed || maxValue);
                   },
+                  min: 0,
                   title: {
                     display: true,
 
