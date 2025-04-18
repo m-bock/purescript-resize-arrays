@@ -38,8 +38,8 @@ main =
     $
       suite "PureScript collections Benchmarks"
         ( \def -> def
-            { sizes = [ 0, 5_000, 10_000, 20_000 ]
-            , iterations = 100
+            { sizes = [ 0, 5_000, 10_000, 15_000, 20_000 ]
+            , iterations = 1000
             }
         )
         [ group "Delete first item"
