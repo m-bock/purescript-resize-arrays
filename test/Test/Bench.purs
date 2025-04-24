@@ -38,7 +38,7 @@ main =
     $
       suite "PureScript collections Benchmarks"
         ( \def -> def
-            { sizes = [ 0, 5_000, 10_000, 15_000, 20_000 ]
+            { sizes = [ 0, 25_000, 50_000, 75_000, 100_000 ]
             , iterations = 1000
             }
         )
