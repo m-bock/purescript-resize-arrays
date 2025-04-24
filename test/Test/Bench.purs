@@ -26,7 +26,7 @@ reporters =
           { filePath = "docs/benchmarks.html"
           , lineStyles =
               mapWithIndex (\ix val -> val { opacity = if ix == 0 then 1.0 else 0.3 }) def.lineStyles
-          , minSpeed = Just $ Milliseconds 5.0
+          , minSpeed = Just $ Milliseconds 1.0
           }
       )
   ]
@@ -39,7 +39,7 @@ main =
       suite "PureScript collections Benchmarks"
         ( \def -> def
             { sizes = [ 0, 25_000, 50_000, 75_000, 100_000 ]
-            , iterations = 1000
+            , iterations = 100
             }
         )
         [ group "Delete first item"
